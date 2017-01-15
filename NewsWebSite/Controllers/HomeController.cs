@@ -73,6 +73,7 @@ namespace NewsWebSite.Controllers
         public ActionResult Index(string ItemsOnPageTB = "10", string BtnForItemsOnPBtn = "", string CurPage = "1", string CurItemOnPageCnt = "10")
         {
             int NewItemsOnPageNum = 10;
+            int NewPageNum = 1;
             if (BtnForItemsOnPBtn == "OK")
             {
                 try
@@ -81,19 +82,17 @@ namespace NewsWebSite.Controllers
                     HttpContext.Response.Cookies["NumberOfItemsOnPage"].Value = NewItemsOnPageNum.ToString();
                 }
                 catch { }
+                try
+                {
+                    int CurPageInt = int.Parse(CurPage);
+                    int CurItemOnPageCntInt = int.Parse(CurItemOnPageCnt);
+                    NewPageNum = (int)((double)(CurItemOnPageCntInt * (CurPageInt - 1) + (CurItemOnPageCntInt / 2)) / NewItemsOnPageNum) + 1;
+                }
+                catch
+                {
+                    NewPageNum = 1;
+                }
             }
-            int NewPageNum;
-            try
-            {
-                int CurPageInt = int.Parse(CurPage);
-                int CurItemOnPageCntInt = int.Parse(CurItemOnPageCnt);
-                NewPageNum = (int)((double)(CurItemOnPageCntInt * (CurPageInt - 1) + (CurItemOnPageCntInt / 2)) / NewItemsOnPageNum) + 1;
-            }
-            catch
-            {
-                NewPageNum = 1;
-            }
-
             return View("Index", GetItems4ListItemPage(NewPageNum, NewItemsOnPageNum));
         }
 
