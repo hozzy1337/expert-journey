@@ -1,0 +1,47 @@
+﻿@using NewsWebSite.Models
+@model ModelForListItemPage
+@{
+    Layout = null;
+}
+
+<html>
+<head>
+
+    <title>WOT-Roll</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/Scripts/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+</head>
+<body>
+    <form method="post">
+        <input type="hidden" name="CurPage" value="@Model.PageNumber">
+        <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage">
+        <div class="info">
+            <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"></p>
+            <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"></p>
+
+            <p>Page: @Model.PageNumber</p>
+            <p>Pages Count: @Model.NumberOfPages</p>
+            @for (int i = 1; i <= Model.NumberOfPages; i++)
+            {
+                <a href="/Home/Index?page=@i.ToString()">@i.ToString() </a>
+            }
+        </div>
+    </form>
+    <hr />
+    <div class="articles">
+        @foreach (var a in Model.ArticleList)
+            {
+            <div class="article">
+                <p><a href="Home/Article?id=@a.Id">@a.Title</a></p>
+                <p>@a.ShortDescription</p>
+            </div>
+            <hr />
+        }
+    </div>
+
+</body>
+</html>
