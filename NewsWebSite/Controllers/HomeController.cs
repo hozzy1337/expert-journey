@@ -119,10 +119,12 @@ namespace NewsWebSite.Controllers
             return View("Index", GetItems4ListItemPage(NewPageNum, NewItemsOnPageNum));
         }
 
-    
-        public ActionResult Article()
+        [HttpGet]
+        public ActionResult Article(int id = 1)
         {
-            return Content("HOZNA SDELAET!");
+            var session = NHibernateHelper.OpenSession();
+            var article = session.Get<Article>(id);
+            return View(article);
         }
 
 
