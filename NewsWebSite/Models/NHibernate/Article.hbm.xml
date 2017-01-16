@@ -9,5 +9,7 @@
     <property name="ShortDescription" />
     <property name="FullDescription" />
     <property name="Image" />
+    <property name="CreateDate" />
+    <property name="LastUpdateDate" />
   </class>
 </hibernate-mapping>

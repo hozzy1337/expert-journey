@@ -17,30 +17,60 @@
 </head>
 <body>
     <form method="post">
-        <input type="hidden" name="CurPage" value="@Model.PageNumber">
-        <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage">
+        @*<input type="hidden" name="CurPage" value="@Model.PageNumber" />*@
+        @*   <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage"/>*@
         <div class="info">
-            <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"></p>
-            <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"></p>
+            @* <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"/></p>
+                <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"/></p>*@
 
-            <p>Page: @Model.PageNumber</p>
-            <p>Pages Count: @Model.NumberOfPages</p>
-            @for (int i = 1; i <= Model.NumberOfPages; i++)
-            {
-                <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
-            }
+            @*<p>Page: @Model.PageNumber</p>*@
+            @*  <p>Pages Count: @Model.NumberOfPages</p>
+                @for (int i = 1; i <= Model.NumberOfPages; i++)
+                {
+                    <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
+                }*@
         </div>
     </form>
     <hr />
-    <div class="articles">
+    <div class="articles" id="articles">
         @foreach (var a in Model.ArticleList)
-            {
+        {
             <div class="article">
                 <p><a href="Home/Article?id=@a.Id">@a.Title</a></p>
                 <p>@a.ShortDescription</p>
             </div>
             <hr />
         }
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var inProgress = false;
+                var startFrom = @Model.PageNumber;
+                $(window).scroll(function () {
+                    if (startFrom < @Model.NumberOfPages && $(window).scrollTop() + $(window).height() >= $(document).height() - 200 && !inProgress) {
+                        $.ajax({
+                            url: '/Home/GetArticles',
+                            method: 'POST',
+                            async: true,
+                            data: { "Page": startFrom },
+                            beforeSend: function () {
+                                inProgress = true;
+                            }
+                        }).done(function (data) {
+                            data = jQuery.parseJSON(data);
+                            if (data.length > 0) {
+                                console.log(data);
+                                $.each(data, function (index, data) {
+                                    $("#articles").append("<div class=\"article\"><p><a href=\"Home/Article?id=" + data.Id + "\">" + data.Title + "</a></p> <p>" + data.ShortDescription + "</p> </div><hr/>");
+                                });
+                                inProgress = false;
+                                startFrom ++;
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+
     </div>
 
 </body>
