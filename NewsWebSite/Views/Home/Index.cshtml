@@ -62,8 +62,8 @@
                                 $.each(data, function (index, data) {
                                     $("#articles").append("<div class=\"article\"><p><a href=\"Home/Article?id=" + data.Id + "\">" + data.Title + "</a></p> <p>" + data.ShortDescription + "</p> </div><hr/>");
                                 });
-                                inProgress = false;
                                 startFrom ++;
+                                inProgress = false;
                             }
                         });
                     }
