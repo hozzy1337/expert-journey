@@ -7,7 +7,7 @@
 <html>
 <head>
 
-    <title>WOT-Roll</title>
+    <title>NEWS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="~/Content/Site.css" rel="stylesheet" />
     <script type="text/javascript" src="~/Scripts/jquery-3.1.1.js"></script>
@@ -27,7 +27,7 @@
             <p>Pages Count: @Model.NumberOfPages</p>
             @for (int i = 1; i <= Model.NumberOfPages; i++)
             {
-                <a href="/Home/Index?page=@i.ToString()">@i.ToString() </a>
+                <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
             }
         </div>
     </form>

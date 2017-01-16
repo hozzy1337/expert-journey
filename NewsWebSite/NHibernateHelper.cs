@@ -23,6 +23,5 @@ namespace NewsWebSite
             new SchemaUpdate(configuration).Execute(true, true);
             return sessionFactory.OpenSession();
         }
-
     }
 }

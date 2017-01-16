@@ -12,7 +12,7 @@ namespace NewsWebSite.Controllers
 {
     public class HomeController : Controller
     {
-       //создает тестовые записи в таблице, онли для дебага
+        //создает тестовые записи в таблице, онли для дебага
         [HttpGet]
         public ActionResult CreateLines(int n = 0)
         {
@@ -31,12 +31,34 @@ namespace NewsWebSite.Controllers
         private ModelForListItemPage GetItems4ListItemPage(int Page, int NumberOfItemsOnPage)
         {
             if (Page < 1) Page = 1;
+
+
+
+
             var session = NHibernateHelper.OpenSession();
+
+
+
+
+
+
+
             var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
             int NumberOfPages = count / NumberOfItemsOnPage + 1;
             if (Page > NumberOfPages) Page = NumberOfPages;
             var FirstResultNum = (Page - 1) * NumberOfItemsOnPage;
+
+
+
+
+
+
             var criteria = session.CreateCriteria<Article>().SetFirstResult(FirstResultNum).SetMaxResults(NumberOfItemsOnPage).AddOrder(Order.Desc("Id"));
+
+
+
+
+
             var list = criteria.List<Article>();
 
             int NumOfPages = count / NumberOfItemsOnPage;
@@ -79,9 +101,10 @@ namespace NewsWebSite.Controllers
                 try
                 {
                     NewItemsOnPageNum = int.Parse(ItemsOnPageTB);
+                    if (NewItemsOnPageNum <= 0 || NewItemsOnPageNum > 100) NewItemsOnPageNum = 10;
                     HttpContext.Response.Cookies["NumberOfItemsOnPage"].Value = NewItemsOnPageNum.ToString();
                 }
-                catch { }
+                catch {; }
                 try
                 {
                     int CurPageInt = int.Parse(CurPage);
@@ -94,6 +117,12 @@ namespace NewsWebSite.Controllers
                 }
             }
             return View("Index", GetItems4ListItemPage(NewPageNum, NewItemsOnPageNum));
+        }
+
+    
+        public ActionResult Article()
+        {
+            return Content("HOZNA SDELAET!");
         }
 
 
