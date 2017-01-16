@@ -58,12 +58,12 @@ namespace NewsWebSite.Controllers
             if (Page < 1) Page = 1;
             //var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
             var session = NHibernateHelper.OpenSession();
-            var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
-            var NumberOfPages = count / NumberOfItemsOnPage + (count % NumberOfItemsOnPage == 0 ? 0 : 1);
+            var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value; //достаем количество записей в таблице
+            var NumberOfPages = count / NumberOfItemsOnPage + (count % NumberOfItemsOnPage == 0 ? 0 : 1); //вычесляем количество страниц
             if (Page > NumberOfPages) Page = NumberOfPages;
-            var list = session.CreateCriteria<Article>().SetFirstResult(0).SetMaxResults(NumberOfItemsOnPage * Page).AddOrder(Order.Desc("Id")).List<Article>();
+            var list = session.CreateCriteria<Article>().SetFirstResult(0).SetMaxResults(NumberOfItemsOnPage * Page).AddOrder(Order.Desc("Id")).List<Article>();//достаем записи
            
-            var model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumberOfPages);
+            var model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumberOfPages); 
             return View(model);
         }
 

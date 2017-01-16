@@ -16,22 +16,22 @@
 
 </head>
 <body>
-    <form method="post">
-        @*<input type="hidden" name="CurPage" value="@Model.PageNumber" />*@
-        @*   <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage"/>*@
+    @*<form method="post">
+        <input type="hidden" name="CurPage" value="@Model.PageNumber" />
+           <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage"/>
         <div class="info">
-            @* <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"/></p>
-                <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"/></p>*@
+             <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"/></p>
+                <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"/></p>
 
-            @*<p>Page: @Model.PageNumber</p>*@
-            @*  <p>Pages Count: @Model.NumberOfPages</p>
+            <p>Page: @Model.PageNumber</p>
+              <p>Pages Count: @Model.NumberOfPages</p>
                 @for (int i = 1; i <= Model.NumberOfPages; i++)
                 {
                     <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
-                }*@
+                }
         </div>
-    </form>
-    <hr />
+    </form> 
+    <hr />*@
     <div class="articles" id="articles">
         @foreach (var a in Model.ArticleList)
         {
