@@ -33,6 +33,33 @@ namespace NewsWebSite.Controllers
             }
             return Content("ok");
         }
+        ////////////////////////////////////////
+        [HttpPost]
+        public bool AddNewArticle(Article add , HttpPostedFileBase loadfile)
+        {
+            try
+            {
+                var session = NHibernateHelper.OpenSession();
+                add.LastUpdateDate = DateTime.Now;
+                add.CreateDate = DateTime.Now;
+                if(loadfile!=null)
+                {
+                    string file_path = Path.GetFileName(loadfile.FileName);
+                    add.Image = file_path;
+                    loadfile.SaveAs(Server.MapPath("~/IMG/") + file_path);
+                }
+                session.BeginTransaction();
+                session.Save(add);
+                session.Transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+/////////////////////////////////
+        
         //---------
 
         //private ModelForListItemPage GetItems4ListItemPage(int Page)
