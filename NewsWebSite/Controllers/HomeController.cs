@@ -14,7 +14,13 @@ namespace NewsWebSite.Controllers
 {
     public class HomeController : Controller
     {
-        const int NumberOfItemsOnPage = 10;
+        readonly IRepository repo;
+
+        public HomeController(IRepository repo)
+        {
+            this.repo = repo;
+        }
+        const int NumberOfItemsOnPage = 7;
         //создает тестовые записи в таблице, онли для дебага
         [HttpGet]
         public ActionResult CreateLines(int n = 0)
@@ -24,12 +30,14 @@ namespace NewsWebSite.Controllers
             {
                 var a = new Article();
                 a.Title = i.ToString();
-                a.ShortDescription = i.ToString();
+              
                 a.CreateDate = DateTime.Now;
                 a.LastUpdateDate = DateTime.Now;
-                session.BeginTransaction();
-                session.Save(a);
-                session.Transaction.Commit();
+                repo.Save(a);
+                //session.BeginTransaction();
+
+                //session.Save(a);
+                //session.Transaction.Commit();
             }
             return Content("ok");
         }
@@ -83,27 +91,37 @@ namespace NewsWebSite.Controllers
         public ActionResult Index(int Page = 1)
         {
             if (Page < 1) Page = 1;
-            //var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
-            var session = NHibernateHelper.OpenSession();
-            var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value; //достаем количество записей в таблице
+            //var session = NHibernateHelper.OpenSession();
+            // var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value; //достаем количество записей в таблице
+            var count = repo.GetCountOfLines();
             var NumberOfPages = count / NumberOfItemsOnPage + (count % NumberOfItemsOnPage == 0 ? 0 : 1); //вычесляем количество страниц
             if (Page > NumberOfPages) Page = NumberOfPages;
-            var list = session.CreateCriteria<Article>().SetFirstResult(0).SetMaxResults(NumberOfItemsOnPage * Page).AddOrder(Order.Desc("Id")).List<Article>();//достаем записи
-           
-            var model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumberOfPages); 
+            // var list = session.CreateCriteria<Article>().SetFirstResult(0).SetMaxResults(NumberOfItemsOnPage * Page).AddOrder(Order.Desc("Id")).List<Article>();//достаем записи
+            var list = repo.GetDemoList(0, NumberOfItemsOnPage * Page);
+            var model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumberOfPages);
             return View(model);
         }
 
         [HttpPost]
-        public string GetArticles(int Page)
+        public string GetNewPageOfArticles(int Page)
         {
+            //ModelState.IsValid
+
             if (Page < 1) Page = 1;
-            var session = NHibernateHelper.OpenSession();
-            var list = session.CreateCriteria<Article>().SetFirstResult(Page * NumberOfItemsOnPage).SetMaxResults(NumberOfItemsOnPage).AddOrder(Order.Desc("Id")).List<Article>();
+            //var session = NHibernateHelper.OpenSession();
+            //var list = session.CreateCriteria<Article>().SetFirstResult(Page * NumberOfItemsOnPage).SetMaxResults(NumberOfItemsOnPage).AddOrder(Order.Desc("Id")).List<Article>();
+            var list = repo.GetDemoList(Page * NumberOfItemsOnPage, NumberOfItemsOnPage);
             var json = JsonConvert.SerializeObject(list);
             return json;
         }
-        
+        [HttpPost]
+        public string GetNPagesOfArticles(int n)
+        {
+            var list = repo.GetDemoList(NumberOfItemsOnPage, n * NumberOfItemsOnPage);
+            var json = JsonConvert.SerializeObject(list);
+            return json;
+        }
+
         //[HttpPost]
         //public ActionResult Index(string ItemsOnPageTB = "10", string BtnForItemsOnPBtn = "", string CurPage = "1", string CurItemOnPageCnt = "10")
         //{
@@ -135,8 +153,9 @@ namespace NewsWebSite.Controllers
         [HttpGet]
         public ActionResult Article(int id = 1)
         {
-            var session = NHibernateHelper.OpenSession();
-            var article = session.Get<Article>(id);
+            //var session = NHibernateHelper.OpenSession();
+            //var article = session.Get<Article>(id);
+            var article = repo.GetItem(id);
             return View(article);
         }
 

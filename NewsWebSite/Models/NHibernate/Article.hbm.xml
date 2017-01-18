@@ -6,7 +6,6 @@
       <generator class="native" />
     </id>
     <property name="Title" />
-    <property name="ShortDescription" />
     <property name="FullDescription" />
     <property name="Image" />
     <property name="CreateDate" />

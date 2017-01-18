@@ -1,12 +1,11 @@
-﻿@using NewsWebSite.Models
+﻿<!DOCTYPE html>
+@using NewsWebSite.Models
 @model ModelForListItemPage
 @{
     Layout = null;
 }
-
 <html>
 <head>
-
     <title>NEWS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="~/Content/Site.css" rel="stylesheet" />
@@ -17,61 +16,191 @@
 </head>
 <body>
     @*<form method="post">
-        <input type="hidden" name="CurPage" value="@Model.PageNumber" />
-           <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage"/>
-        <div class="info">
-             <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"/></p>
-                <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"/></p>
+            <input type="hidden" name="CurPage" value="@Model.PageNumber" />
+               <input type="hidden" name="CurItemOnPageCnt" value="@Model.NumberOfItemsOnPage"/>
+            <div class="info">
+                 <p><input type="text" name="ItemsOnPageTB" value="@Model.NumberOfItemsOnPage"/></p>
+                    <p><input type="submit" name="BtnForItemsOnPBtn" value="OK"/></p>
 
-            <p>Page: @Model.PageNumber</p>
-              <p>Pages Count: @Model.NumberOfPages</p>
-                @for (int i = 1; i <= Model.NumberOfPages; i++)
-                {
-                    <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
-                }
-        </div>
-    </form> 
-    <hr />*@
+                <p>Page: @Model.PageNumber</p>
+                  <p>Pages Count: @Model.NumberOfPages</p>
+                    @for (int i = 1; i <= Model.NumberOfPages; i++)
+                    {
+                        <a href="/Home/Index?page=@i.ToString()"> @i.ToString() </a>
+                    }
+            </div>
+        </form>
+        <hr />*@
+   @* <a href="#myDiv">click me</a>*@
+    <button onclick="ScrollTo('#dimas');">Click Me</button>
+    <div id="message">Recorded <b>0</b> clicks</div>
+    <hr />
+    <br />
     <div class="articles" id="articles">
         @foreach (var a in Model.ArticleList)
         {
             <div class="article">
-                <p><a href="Home/Article?id=@a.Id">@a.Title</a></p>
-                <p>@a.ShortDescription</p>
+                <a id="@a.Id" href="Home/Article?id=@a.Id" onclick="Redirect(@a.Id);">@a.Title</a>
+                .@*    <button id="btn-@a.Id" onclick="Redirect(@a.Id);">@a.Title</button>*@
+                <p>@a.Id</p>
             </div>
             <hr />
         }
+    </div>
+
+    <div id="dimas">content</div>
         <script type="text/javascript">
-            $(document).ready(function () {
-                var inProgress = false;
-                var startFrom = @Model.PageNumber;
-                $(window).scroll(function () {
-                    if (startFrom < @Model.NumberOfPages && $(window).scrollTop() + $(window).height() >= $(document).height() - 200 && !inProgress) {
-                        $.ajax({
-                            url: '/Home/GetArticles',
-                            method: 'POST',
-                            async: true,
-                            data: { "Page": startFrom },
-                            beforeSend: function () {
-                                inProgress = true;
-                            }
-                        }).done(function (data) {
-                            data = jQuery.parseJSON(data);
-                            if (data.length > 0) {
-                                console.log(data);
-                                $.each(data, function (index, data) {
-                                    $("#articles").append("<div class=\"article\"><p><a href=\"Home/Article?id=" + data.Id + "\">" + data.Title + "</a></p> <p>" + data.ShortDescription + "</p> </div><hr/>");
-                                });
-                                startFrom ++;
-                                inProgress = false;
-                            }
+            //var bool = false;
+            var inProgress = false;
+            var startFrom = @Model.PageNumber;
+            var lastid = 0;
+
+            function RequestArticles(runAtStart) {
+                // if (startFrom < @Model.NumberOfPages && !inProgress && ($(window).scrollTop() >= $(document).height() - $(window).height() - 200 || $(window).height() >= $(document).height())){
+
+                $.ajax({
+                    url: '/Home/GetNewPageOfArticles',
+                    method: 'POST',
+                    async: true,
+                    data: { "Page": startFrom },
+                    beforeSend: function () {
+                        inProgress = true;
+                    }
+                }).done(function (data) {
+                    //alert("loaded!"+startFrom);
+                    data = jQuery.parseJSON(data);
+                    if (data.length > 0) {
+                        lastid =data[0].Id;
+                        //console.log(data);
+                       // location.hash
+                        $.each(data, function (index, data) {
+                            $("#articles").append("<div class=\"article\"><p><a id=\"btn-" + data.Id + "\" href=\"Home/Article?Id=" + data.Id + "\" onclick=\"Redirect(" + data.Id + ");\">" + data.Title + "</a></p></div><p>"+data.Id+"</p><hr/>");
                         });
+
+                    }
+                    startFrom ++;
+                    location.hash=startFrom-1+':'+lastid;
+                    inProgress = false;
+                    //location.hash = startFrom;
+                   // if(runAtStart && startFrom < @Model.NumberOfPages && !inProgress && $(window).height() >= $(document).height()) RequestArticles(true);
+                   
+                });
+                // }
+            }
+            function GetNPagesOfArticles(page)
+            {
+                $.ajax({
+                    url: '/Home/GetNPagesOfArticles',
+                    method: 'POST',
+                    async: false,
+                    data: { "n": page + 1 },
+                    beforeSend: function () {
+                        inProgress = true;
+                    }
+                }).done(function (data) {
+                    //alert("loaded!"+startFrom);
+                    data = jQuery.parseJSON(data);
+                    if (data.length > 0)
+                    {
+                      //  alert("loadingNpages");
+                        //console.log(data);
+                        //  location.hash
+                        
+                        $.each(data, function (index, data) {
+                            $("#articles").append("<div class=\"article\"><p><a id=\"btn-" + data.Id + "\" href=\"Home/Article?Id=" + data.Id + "\" onclick=\"Redirect(" + data.Id + ");\">" + data.Title + "</a></p> </div><p>"+data.Id+"</p><hr/>");
+                          @* <a id="@a.Id" href="Home/Article?id=@a.Id" onclick="Redirect(@a.Id);">@a.Title</a>*@
+                        });
+
+                    }
+                    startFrom = page + 1;
+                //    bool = true;
+                  //  alert(startFrom);
+                    inProgress = false;
+                   // if(startFrom < @Model.NumberOfPages && !inProgress && $(window).height() >= $(document).height()) RequestArticles();
+                    //else
+                    //alert("scroll!");
+                    //ScrollTo('#btn-'+id);
+                });
+            }
+
+
+            $(document).ready(function () {
+                $(window).scroll(function()
+                {
+                  // if(!bool)
+                    //alert("scroll");
+                    if (startFrom < @Model.NumberOfPages && !inProgress && ($(window).scrollTop() >= $(document).height() - $(window).height() ))
+                    {
+                       // alert("request");
+                        RequestArticles(false);
                     }
                 });
+                var id = 0;
+                var page = 0;
+                if (location.hash.length > 0)
+                {
+                    var string = location.hash.replace('#','');
+                    var arr = string.split(':');
+                    page = arr[0];
+                    id = arr[1];
+
+                }
+               // alert("id: " + id +" page: " + page);
+                if(id > 1 && page > 1)
+                {
+                    GetNPagesOfArticles(page - 1);
+                    ScrollTo('#btn-' + id);
+                }
+               // alert("startfrom: "+ startFrom + "inprogress: " + inProgress);
+                if(startFrom < @Model.NumberOfPages && !inProgress && $(window).height() >= $(document).height())
+                {
+                    //alert("requst!");
+                    RequestArticles(true);
+                }
+                
+               
+
+
+
+                //$("a").click(function () {
+                //    var elementClick = $(this).attr("href");
+                //    var destination = $(elementClick).offset().top;
+                //    alert("href: " + elementClick);
+                //    if ($.browser.safari) {
+                //        $('body').animate({ scrollTop: destination }, 1100); //1100 - скорость
+                //    } else {
+                //        $('html').animate({ scrollTop: destination }, 1100);
+                //    }
+                //    return false;
+                //});
+
+
+
             });
+            function ScrollTo(id)
+            {
+                var destination = $(id).offset().top;
+              //  alert (destination);
+
+                $('body').animate({ scrollTop: destination }, 1100);
+
+                $('html').animate({ scrollTop: destination }, 1100);
+
+                //return false;
+                //var body = $("html, body");
+                //body.stop().animate({scrollTop:0}, '500', 'swing', function() {
+                //    alert("Finished animating");
+                //});
+            }
+            function Redirect(id)
+            {
+                var b = document.getElementById('btn-'+id);
+                location.hash = startFrom + ':' +id;
+                // window.location("Home/Article?Id="+id);
+            }
         </script>
 
-    </div>
+   
 
 </body>
 </html>
