@@ -1,4 +1,6 @@
-﻿using NHibernate;
+﻿using NewsWebSite.Models.ViewModel;
+using Newtonsoft.Json;
+using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
 using System;
@@ -12,111 +14,144 @@ namespace NewsWebSite.Models
     {
         Article GetItem(int id);
         int GetCountOfLines();
-        IList<Article> GetList(int starfrom = 0, int count = 10);
-        IList<DemoArticle> GetDemoList(int starfrom = 0, int count = 10);
-        void Save(Article article);
+        IList<Article> GetList(int starFrom, int count);
+        PagedList<DemoArticle> GetDemoList(int starFrom, int count);
+        int SaveOrUpdate(Article article);
+        int SaveOrUpdate(CreateArticleModel model);
+        string GetDemoListJson(int startFrom, int count);
     }
 
     public class NHibernateRepository : IRepository
     {
         readonly ISessionFactory sessionFactory;
 
+
         public NHibernateRepository(ISessionFactory sessionFactory)
         {
             this.sessionFactory = sessionFactory;
         }
+      
 
-        public void Save(Article a)
+        public int SaveOrUpdate(Article a)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                session.BeginTransaction();
-                session.Save(a);
-                session.Transaction.Commit();
+                using (var t = session.BeginTransaction())
+                {
+                    var timeNow = DateTime.Now.ToString("MM/dd/yy H:mm"); ;
+                    if (a.CreateDate == null)
+                        a.CreateDate = timeNow;
+                    a.LastUpdateDate = timeNow;
+                    session.SaveOrUpdate(a);
+                    t.Commit();
+                    return a.Id;
+
+                }
             }
         }
+
+       
+        public int SaveOrUpdate(CreateArticleModel model)
+        {
+            Article a = new Article();
+            a.Title = model.Title;
+            a.FullDescription = model.FullDescription;
+            a.Image = model.Image.FileName;
+            return SaveOrUpdate(a);
+        }
+
+
         public Article GetItem(int id)
         {
-            Article article;
             using (var session = sessionFactory.OpenSession())
             {
-                article = session.Get<Article>(id);
+                return session.Get<Article>(id);
             }
-            return article;
         }
 
-        public IList<Article> GetList(int starfrom = 0, int count = 10)
+
+        public IList<Article> GetList(int starFrom = 0, int count = 10)
         {
             using (var session = sessionFactory.OpenSession())
             {
                 var list = session.CreateCriteria<Article>()
-                    .SetFirstResult(starfrom)
+                    .SetFirstResult(starFrom)
                     .SetMaxResults(count)
                     .AddOrder(Order.Desc("Id"))
-                    .List<Article>();//достаем записи
+                    .List<Article>();
                 return list;
             }
-
         }
-        public IList<DemoArticle> GetDemoList(int starfrom = 0, int count = 10)
+
+
+        public PagedList<DemoArticle> GetDemoList(int starFrom = 0, int count = 10)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var results = session.CreateCriteria<Article>()
+                var results = new PagedList<DemoArticle>();
+
+                results.AddRange(session.CreateCriteria<Article>()
                     .SetProjection(Projections.ProjectionList()
                     .Add(Projections.Id(), "Id")
                     .Add(Projections.Property("Title"), "Title")
                     .Add(Projections.Property("Image"), "Image")
                     .Add(Projections.Property("CreateDate"), "CreateDate")
                     .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"))
-                    .SetFirstResult(starfrom)
+                    .SetFirstResult(starFrom)
                     .SetMaxResults(count)
                     .AddOrder(Order.Desc("Id"))
                     .SetResultTransformer(Transformers.AliasToBean<DemoArticle>())
-                    .List<DemoArticle>();
-                //var list = session.CreateCriteria<Article>().SetFirstResult(starfrom).SetMaxResults(count).AddOrder(Order.Desc("Id")).List<Article>();//достаем записи
+                    .List<DemoArticle>());
+                results.TotalCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
                 return results;
             }
         }
+
+        public string GetDemoListJson(int startFrom, int count)
+        {
+            var list = GetDemoList(startFrom, count);
+            return JsonConvert.SerializeObject(list);
+        }
+
         public int GetCountOfLines()
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value; //достаем количество записей в таблице
+                var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
                 return count;
             }
         }
     }
 
-   /* public class CachedRepository : IRepository
-    {
-        readonly IRepository _realRepo;
+    /* public class CachedRepository : IRepository
+     {
+         readonly IRepository _realRepo;
 
-        public CachedRepository(IRepository realRepo)
-        {
-            _realRepo = realRepo;
-        }
+         public CachedRepository(IRepository realRepo)
+         {
+             _realRepo = realRepo;
+         }
 
-        public Article GetItem(int id)
-        {
+         public Article GetItem(int id)
+         {
 
-            //check if article exsit in cache
-            var article = _realRepo.GetItem(id);
+             //check if article exsit in cache
+             var article = _realRepo.GetItem(id);
 
-            var cacheKey = string.Join("::", id, article.LastUpdateDate);
-            //put to cache
-        }
+             var cacheKey = string.Join("::", id, article.LastUpdateDate);
+             //put to cache
+         }
 
-        public PagedList<Article> GetList(int offset = 0, int count = 10)
-        {
-            throw new NotImplementedException();
-        }
+         public PagedList<Article> GetList(int offset = 0, int count = 10)
+         {
+             throw new NotImplementedException();
+         }
 
-        public void Save(Article article)
-        {
-            //remove from cache by key
-        }
-    } */
+         public void Save(Article article)
+         {
+             //remove from cache by key
+         }
+     } */
 
     public class PagedList<T> : List<T>
     {

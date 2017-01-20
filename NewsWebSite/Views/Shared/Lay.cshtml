@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    @Styles.Render("~/Content/main_adaptive.css")
+    @Styles.Render("https://fonts.googleapis.com/css?family=EB+Garamond")
+    @Styles.Render("https://fonts.googleapis.com/css?family=El+Messiri|Rubik+One")
+    @Scripts.Render("~/Scripts/jquery-3.1.1.js")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+    <title>News Portal</title>
+</head>
+<body>
+    <div class="main_page">
+        <div class="header">
+            <div class="top">
+                <form action="" method="get">
+                    <input type="search" name="search_field" id="search_field" placeholder="Input your text">
+                    <input type="submit" value="" name="search_button">
+                </form>
+            </div>
+            <div class="bottom">
+                <div class="logo">
+                    <a href="/Home/Index" class="main-title"><h1>Новостной портал</h1></a>
+                </div>
+                <div class="nav_panel">
+                    <ul>
+                        <li><a href="@Url.Action("CreateArticle")">Create Article</a></li>
+                        <li><a href="">Menu 2</a></li>
+                        <li><a href="">Menu 3</a></li>
+                        <li><a href="">Menu 4</a></li>
+                        <li><a href="">Menu 5</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main_content">
+            <div class="panel left">
+                <div class="block one">
+                    <h3>Популярные новости</h3>
+                    <div class="news_place">
+                        <div class="news_item">
+                            <img src="tiDNCMp.png" alt="">
+                            <h3><a href="">Заголовок новости</a></h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+                        </div>
+                        <div class="news_item">
+                            <img src="tiDNCMp.png" alt="">
+                            <h3><a href="">Заголовок новости</a></h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+                        </div>
+                        <div class="news_item">
+                            <img src="tiDNCMp.png" alt="">
+                            <h3><a href="">Заголовок новости</a></h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+                        </div>
+                        <div class="news_item">
+                            <img src="tiDNCMp.png" alt="">
+                            <h3><a href="">Заголовок новости</a></h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+                        </div>
+                    </div>
+                </div>
+               @* <div class="block two">
+        <h3>Последние новости</h3>
+        <div class="news_place">
+            <div class="news_item">
+                <img src="tiDNCMp.png" alt="">
+                <h3><a href="">Заголовок новости</a></h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+            </div>
+            <div class="news_item">
+                <img src="tiDNCMp.png" alt="">
+                <h3><a href="">Заголовок новости</a></h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+            </div>
+            <div class="news_item">
+                <img src="tiDNCMp.png" alt="">
+                <h3><a href="">Заголовок новости</a></h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+            </div>
+            <div class="news_item">
+                <img src="tiDNCMp.png" alt="">
+                <h3><a href="">Заголовок новости</a></h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, architecto atque autem consectetur doloribus hic, id illum laudantium </p>
+            </div>
+        </div>
+    </div>*@
+            </div>
+            <div class="panel center">
+               @RenderBody()
+            </div>
+            <div class="panel right">
+                <div class="block one"></div>
+            </div>
+        </div>
+        <div class="footer">POWERED BY ME</div>
+    </div>
+</body>
+</html>

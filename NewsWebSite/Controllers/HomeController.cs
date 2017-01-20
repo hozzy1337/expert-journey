@@ -1,4 +1,4 @@
-﻿
+﻿using NewsWebSite.Models.ViewModel;
 using NewsWebSite.Models;
 using Newtonsoft.Json;
 using NHibernate.Criterion;
@@ -6,22 +6,30 @@ using NHibernate.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
 
 namespace NewsWebSite.Controllers
 {
     public class HomeController : Controller
     {
+        const int NumberOfItemsOnPage = 15;
+        //const string UserImagesFolder = "~/Content/UserImages/";
         readonly IRepository repo;
+
 
         public HomeController(IRepository repo)
         {
             this.repo = repo;
         }
-        const int NumberOfItemsOnPage = 7;
-        //создает тестовые записи в таблице, онли для дебага
+
+
+
+        //создает тестовые записи в таблице, для дебага
         [HttpGet]
         public ActionResult CreateLines(int n = 0)
         {
@@ -30,148 +38,101 @@ namespace NewsWebSite.Controllers
             {
                 var a = new Article();
                 a.Title = i.ToString();
-              
-                a.CreateDate = DateTime.Now;
-                a.LastUpdateDate = DateTime.Now;
-                repo.Save(a);
-                //session.BeginTransaction();
+                //a.CreateDate = DateTime.Now;
+                //a.LastUpdateDate = DateTime.Now;
+                repo.SaveOrUpdate(a);
 
-                //session.Save(a);
-                //session.Transaction.Commit();
             }
             return Content("ok");
         }
-        ////////////////////////////////////////
-        [HttpPost]
-        public bool AddNewArticle(Article add , HttpPostedFileBase loadfile)
-        {
-            try
-            {
-                var session = NHibernateHelper.OpenSession();
-                add.LastUpdateDate = DateTime.Now;
-                add.CreateDate = DateTime.Now;
-                if(loadfile!=null)
-                {
-                    string file_path = Path.GetFileName(loadfile.FileName);
-                    add.Image = file_path;
-                    loadfile.SaveAs(Server.MapPath("~/IMG/") + file_path);
-                }
-                session.BeginTransaction();
-                session.Save(add);
-                session.Transaction.Commit();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-/////////////////////////////////
-        
-        //---------
+        //-------------------------------------------
 
-        //private ModelForListItemPage GetItems4ListItemPage(int Page)
-        //{
-        //    if (Page < 1) Page = 1;
-        //    var session = NHibernateHelper.OpenSession();
-        //    var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
-        //    int NumberOfPages = count / NumberOfItemsOnPage + 1;
-        //    if (Page > NumberOfPages) Page = NumberOfPages;
-        //    var FirstResultNum = (Page - 1) * NumberOfItemsOnPage;
-        //    var criteria = session.CreateCriteria<Article>().SetFirstResult(FirstResultNum).SetMaxResults(NumberOfItemsOnPage).AddOrder(Order.Desc("Id"));
-        //    var list = criteria.List<Article>();
-
-        //    int NumOfPages = count / NumberOfItemsOnPage;
-        //    ModelForListItemPage model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumOfPages + (count % NumberOfItemsOnPage == 0 ? 0 : 1));
-        //    return model;
-        //}
 
 
         [HttpGet]
-        public ActionResult Index(int Page = 1)
+        public ActionResult Article(int id = 0)
         {
-            if (Page < 1) Page = 1;
-            //var session = NHibernateHelper.OpenSession();
-            // var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value; //достаем количество записей в таблице
-            var count = repo.GetCountOfLines();
-            var NumberOfPages = count / NumberOfItemsOnPage + (count % NumberOfItemsOnPage == 0 ? 0 : 1); //вычесляем количество страниц
-            if (Page > NumberOfPages) Page = NumberOfPages;
-            // var list = session.CreateCriteria<Article>().SetFirstResult(0).SetMaxResults(NumberOfItemsOnPage * Page).AddOrder(Order.Desc("Id")).List<Article>();//достаем записи
-            var list = repo.GetDemoList(0, NumberOfItemsOnPage * Page);
-            var model = new ModelForListItemPage(NumberOfItemsOnPage, Page, list, NumberOfPages);
+            if (id > 0)
+            {
+                var article = repo.GetItem(id);
+                return View(article);
+            }
+            return HttpNotFound();
+        }
+
+        public ActionResult CreateArticle()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult EditArticle(int id = 0)
+        {
+            if (id < 1) return HttpNotFound();
+            var article = repo.GetItem(id);
+            if (article == null) return HttpNotFound();
+            return View(new EditArticleModel(article));
+        }
+
+        [HttpPost]
+        public ActionResult EditArticle(EditArticleModel edited)
+        {
+            if (!ModelState.IsValid) return View(edited);
+            var baseArticle = repo.GetItem(edited.Id);
+            if (baseArticle == null) return HttpNotFound();
+            var changesExist = false;
+            if (edited.Image != null)
+            {
+                FIleHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), edited.Image, baseArticle.Id);
+                baseArticle.Image = edited.Image.FileName;
+                changesExist = true;
+            }
+            if (edited.Title != null)
+            {
+                baseArticle.Title = edited.Title;
+                changesExist = true;
+            }
+            if (edited.FullDescription != null)
+            {
+                baseArticle.FullDescription = edited.FullDescription;
+                changesExist = true;
+            }
+
+            if (changesExist)
+                repo.SaveOrUpdate(baseArticle);
+            return RedirectToAction("Article", new { Id = edited.Id });
+        }
+
+        [HttpPost]
+        public ActionResult CreateArticle(CreateArticleModel a)
+        {
+            if (!ModelState.IsValid) return View(a);
+            var id = repo.SaveOrUpdate(a);
+            FIleHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
+            return RedirectToAction("Article", new { Id = id });
+        }
+
+        [HttpGet]
+        public ActionResult Index()
+        {
+            var list = repo.GetDemoList(0, NumberOfItemsOnPage);
+            var model = new ListItemPageModel(NumberOfItemsOnPage, list);
             return View(model);
         }
 
         [HttpPost]
-        public string GetNewPageOfArticles(int Page)
+        public ActionResult GetNewPageOfArticles(int Page)
         {
-            //ModelState.IsValid
-
-            if (Page < 1) Page = 1;
-            //var session = NHibernateHelper.OpenSession();
-            //var list = session.CreateCriteria<Article>().SetFirstResult(Page * NumberOfItemsOnPage).SetMaxResults(NumberOfItemsOnPage).AddOrder(Order.Desc("Id")).List<Article>();
-            var list = repo.GetDemoList(Page * NumberOfItemsOnPage, NumberOfItemsOnPage);
-            var json = JsonConvert.SerializeObject(list);
-            return json;
+            if (Page < 1) return Content("");
+            var list = repo.GetDemoListJson(Page * NumberOfItemsOnPage, NumberOfItemsOnPage);
+            return Json(list);
         }
+
         [HttpPost]
-        public string GetNPagesOfArticles(int n)
+        public ActionResult GetNPagesOfArticles(int n)
         {
-            var list = repo.GetDemoList(NumberOfItemsOnPage, n * NumberOfItemsOnPage);
-            var json = JsonConvert.SerializeObject(list);
-            return json;
-        }
-
-        //[HttpPost]
-        //public ActionResult Index(string ItemsOnPageTB = "10", string BtnForItemsOnPBtn = "", string CurPage = "1", string CurItemOnPageCnt = "10")
-        //{
-        //    int NewItemsOnPageNum = 10;
-        //    int NewPageNum = 1;
-        //    if (BtnForItemsOnPBtn == "OK")
-        //    {
-        //        try
-        //        {
-        //            NewItemsOnPageNum = int.Parse(ItemsOnPageTB);
-        //            if (NewItemsOnPageNum <= 0 || NewItemsOnPageNum > 100) NewItemsOnPageNum = 10;
-        //            HttpContext.Response.Cookies["NumberOfItemsOnPage"].Value = NewItemsOnPageNum.ToString();
-        //        }
-        //        catch {; }
-        //        try
-        //        {
-        //            int CurPageInt = int.Parse(CurPage);
-        //            int CurItemOnPageCntInt = int.Parse(CurItemOnPageCnt);
-        //            NewPageNum = (int)((double)(CurItemOnPageCntInt * (CurPageInt - 1) + (CurItemOnPageCntInt / 2)) / NewItemsOnPageNum) + 1;
-        //        }
-        //        catch
-        //        {
-        //            NewPageNum = 1;
-        //        }
-        //    }
-        //    return View("Index", GetItems4ListItemPage(NewPageNum, NewItemsOnPageNum));
-        //}
-
-        [HttpGet]
-        public ActionResult Article(int id = 1)
-        {
-            //var session = NHibernateHelper.OpenSession();
-            //var article = session.Get<Article>(id);
-            var article = repo.GetItem(id);
-            return View(article);
-        }
-
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            var list = repo.GetDemoListJson(NumberOfItemsOnPage, n * NumberOfItemsOnPage);
+            return Json(list);
         }
     }
 }

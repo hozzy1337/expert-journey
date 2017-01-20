@@ -1,0 +1,74 @@
+﻿@using NewsWebSite.Models.ViewModel
+@model CreateArticleModel
+@{
+    //Layout = "~/Views/Shared/Lay.cshtml";
+    Layout = null;
+}
+
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+
+
+
+@using (Html.BeginForm("CreateArticle", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>
+        @Html.LabelFor(model => Model.Title, new { @class = "DIMAS"})
+        @Html.EditorFor(model => model.Title)
+        @Html.ValidationMessageFor(model => model.Title)
+    </div>
+    <br/>
+    <div>
+        @Html.LabelFor(model => Model.FullDescription)
+        @Html.EditorFor(model => model.FullDescription)
+        @Html.ValidationMessageFor(model => model.FullDescription)
+    </div>
+    <br />
+    <div>
+        @Html.LabelFor(model => Model.Image)
+        @Html.TextBoxFor(model => model.Image, new { type = "file", accept = "image/jpeg,image/png,.jpg,.png", @id="inputfile"})
+        @Html.ValidationMessageFor(model => model.Image)
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#inputfile').keyup(function () {
+                alert(this.val());
+            });
+        })
+
+
+
+
+        var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+        function Validate(oForm) {
+            var arrInputs = $("input[for='Image']").val();
+                var oInput = arrInputs[i];
+                if (oInput.type == "file") {
+                    var sFileName = oInput.value;
+                    if (sFileName.length > 0) {
+                        var blnValid = false;
+                        for (var j = 0; j < _validFileExtensions.length; j++) {
+                            var sCurExtension = _validFileExtensions[j];
+                            if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                                blnValid = true;
+                                break;
+                            }
+                        }
+
+                        if (!blnValid) {
+                            alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+                            return false;
+                        }
+                    }
+                
+            }
+
+            return true;
+        }
+    </script>
+    <input type="submit" name="sub" value="sub">
+}
+
+
