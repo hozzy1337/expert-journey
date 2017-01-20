@@ -15,17 +15,7 @@ namespace NewsWebSite.Models
         public virtual string Title { get; set; }
         public virtual string FullDescription { get; set; }
         public virtual string Image { get; set; }
-        public virtual string CreateDate { get; set; }
-        public virtual string LastUpdateDate { get; set; }
-
-        public Article(EditArticleModel a)
-        {
-            Title = a.Title;
-            FullDescription = a.FullDescription;
-        }
-
-        public Article()
-        {
-        }
+        public virtual DateTime CreateDate { get; set; }
+        public virtual DateTime LastUpdateDate { get; set; }
     }
 }

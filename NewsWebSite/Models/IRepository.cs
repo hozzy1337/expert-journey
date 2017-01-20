@@ -38,8 +38,8 @@ namespace NewsWebSite.Models
             {
                 using (var t = session.BeginTransaction())
                 {
-                    var timeNow = DateTime.Now.ToString("MM/dd/yy H:mm"); ;
-                    if (a.CreateDate == null)
+                    var timeNow = DateTime.Now;
+                    if (a.CreateDate == DateTime.MinValue)
                         a.CreateDate = timeNow;
                     a.LastUpdateDate = timeNow;
                     session.SaveOrUpdate(a);

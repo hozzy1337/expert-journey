@@ -54,7 +54,7 @@ namespace NewsWebSite.Controllers
         {
             if (id > 0)
             {
-                var article = repo.GetItem(id);
+                var article = new ArticleForView(repo.GetItem(id));
                 return View(article);
             }
             return HttpNotFound();
@@ -83,19 +83,23 @@ namespace NewsWebSite.Controllers
             var changesExist = false;
             if (edited.Image != null)
             {
-                FIleHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), edited.Image, baseArticle.Id);
-                baseArticle.Image = edited.Image.FileName;
-                changesExist = true;
+                var fileHelper = new FIleHelper();
+                var isChanged = fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), edited.Image, baseArticle.Id);
+                if (isChanged)
+                {
+                    baseArticle.Image = edited.Image.FileName;
+                    changesExist = true;
+                }
             }
-            if (edited.Title != null)
-            {
-                baseArticle.Title = edited.Title;
-                changesExist = true;
+            if (edited.Title != null && baseArticle.Title != edited.Title)
+            {        
+                    baseArticle.Title = edited.Title;
+                    changesExist = true;
             }
-            if (edited.FullDescription != null)
+            if (edited.FullDescription != null && baseArticle.FullDescription != edited.FullDescription)
             {
-                baseArticle.FullDescription = edited.FullDescription;
-                changesExist = true;
+                    baseArticle.FullDescription = edited.FullDescription;
+                    changesExist = true; 
             }
 
             if (changesExist)
@@ -108,7 +112,8 @@ namespace NewsWebSite.Controllers
         {
             if (!ModelState.IsValid) return View(a);
             var id = repo.SaveOrUpdate(a);
-            FIleHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
+            FIleHelper fileHelper = new FIleHelper();
+            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
             return RedirectToAction("Article", new { Id = id });
         }
 
