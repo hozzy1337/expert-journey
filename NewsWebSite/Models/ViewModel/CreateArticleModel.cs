@@ -24,6 +24,7 @@ namespace NewsWebSite.Models.ViewModel
         [Required]
         [Display(Name = "Изображение")]
         [ValidImage]
+        [AllowedExtensions(new string[] {".jpg", ".png" })]
         public HttpPostedFileBase Image { get; set; }
     }
 }

@@ -17,5 +17,20 @@ namespace NewsWebSite.Models
         public virtual string Image { get; set; }
         public virtual DateTime CreateDate { get; set; }
         public virtual DateTime LastUpdateDate { get; set; }
+
+        public Article(CreateArticleModel model)
+        {
+            Title = model.Title;
+            FullDescription = model.FullDescription;
+            Image = model.Image.FileName;
+        }
+        public Article()
+        {
+            Title = null;
+            FullDescription = null;
+            Image = null;
+            CreateDate = DateTime.MinValue;
+            LastUpdateDate = DateTime.MinValue;
+        }
     }
 }

@@ -10,10 +10,10 @@ namespace NewsWebSite.Models.ViewModel
         public int NumberOfItemsOnPage { get; set; }
         public PagedList<DemoArticle> ArticleList { get; set; }
 
-        public ListItemPageModel(int NumberOfItemsOnPage, PagedList<DemoArticle> ArticleList)
+        public ListItemPageModel(int numberOfItemsOnPage, PagedList<DemoArticle> articlesList)
         {
-            this.NumberOfItemsOnPage = NumberOfItemsOnPage;
-            this.ArticleList = ArticleList;
+            NumberOfItemsOnPage = numberOfItemsOnPage;
+            ArticleList = articlesList;
         }
     }
 }

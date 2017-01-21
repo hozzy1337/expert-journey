@@ -17,13 +17,14 @@ namespace NewsWebSite.Models.ViewModel
         [Display(Name = "Заголовок статьи")]
         [StringLength(50, ErrorMessage = "Description Max Length is 50")]
         public string Title { get; set; }
-        
+
         [Display(Name = "Текст статьи")]
         [StringLength(4000, ErrorMessage = "Description Max Length is 4000")]
         public string FullDescription { get; set; }
 
         [Display(Name = "Изображение")]
-        [ValidImageEditArticle]
+        [ValidImage(maxSizeMB = 5)]
+        [AllowedExtensions(new string[] { ".jpg", ".png" })]
         public HttpPostedFileBase Image { get; set; }
 
         public EditArticleModel(Article a)

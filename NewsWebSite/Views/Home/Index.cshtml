@@ -1,5 +1,4 @@
-﻿
-@using NewsWebSite.Models.ViewModel
+﻿@using NewsWebSite.Models.ViewModel
 @model ListItemPageModel
 @{
     Layout = "~/Views/Shared/Lay.cshtml";
@@ -9,28 +8,22 @@
     @foreach (var a in Model.ArticleList)
     {
         <div class="news_item">
-            <h3><a id="@a.Id" href="@Url.Action("Article", new {Id = a.Id})" onclick="Redirect(@a.Id);">@a.Title.Substring(0, (a.Title.Length <= 15 ? a.Title.Length : 15))</a></h3>
+            <h3>
+                <a id="@a.Id" href="@Url.Action("Article", new {Id = a.Id})" onclick="Redirect(@a.Id);">
+                    @a.Title.Substring(0, (a.Title.Length <= 15 ? a.Title.Length : 15))
+                    @*временно, чтобы не ломался сайт при длинных заголовках*@
+                </a>
+                
+            </h3>
             <span class="time">@a.CreateDate</span>
             <div><img alt="IMG" class="images" src="~/Content/UserImages/@a.Id/@a.Image"></div>
         </div>
     }
 </div>
-@*TOFIX!-------------------------
-    @{
-        <script type="text/javascript">
-            alert("@Url.Action("Article")");
-            </script>
-        if (Model.alertMSG.Length > 0)
-        {
-            <script type="text/javascript">
-                alert("@Model.alertMSG");
-            </script>
-        }
-    }
-    -------------------------------*@
+
 <script type="text/javascript">
-   // var temp = $('#template').html();
-   
+    // var temp = $('#template').html();
+
     var loadingComplete = false;
     //var bool = false;
     var inProgress = false;
@@ -40,9 +33,10 @@
     function RequestArticles(runAtStart) {
 
         $.ajax({
-            url: '/Home/GetNewPageOfArticles',
+            url: '/Home/GetArticles',
             timeout: 3000,
             method: 'POST',
+            dataType: 'Json',
             async: true,
             data: { "Page": startFrom },
             beforeSend: function () {
@@ -50,13 +44,14 @@
             }
         }).done(function (data) {
             //  console.log(data);
-            data = jQuery.parseJSON(data);
+            //console.log(data);
+            // data = jQuery.parseJSON(data);
             if (data.length > 0) {
                 lastid =data[0].Id;
                 //console.log(data);
                 // location.hash
                 $.each(data, function (index, data) {
-                       $("#news_panel").append("<div class=\"news_item\"><h3><a id =\"" + data.Id +"\" href=\"Home/Article?id=" + data.Id+ "\" onclick=\"Redirect(" + data.Id +");\">" + data.Title + "</a></h3><span class=\"time\">" + data.CreateDate +"</span> <div><img alt=\"IMG\" class=\"images\" src=\"~/Content/UserImages/"+data.Id+"/" + data.Image +"\"/></div>");
+                    $("#news_panel").append("<div class=\"news_item\"><h3><a id =\"" + data.Id +"\" href=\"Home/Article?id=" + data.Id+ "\" onclick=\"Redirect(" + data.Id +");\">" + data.Title + "</a></h3><span class=\"time\">" + data.CreateDate +"</span> <div><img alt=\"IMG\" class=\"images\" src=\"~/Content/UserImages/"+data.Id+"/" + data.Image +"\"/></div>");
                     //var temp = $('#template').text;
                 });
 
@@ -69,9 +64,10 @@
     function GetNPagesOfArticles(page)
     {
         $.ajax({
-            url: '/Home/GetNPagesOfArticles',
+            url: '/Home/GetArticles',
             timeout: 3000,
             method: 'POST',
+            dataType: 'Json',
             async: true,
             data: { "n": page  },
             beforeSend: function () {
@@ -79,7 +75,7 @@
             }
         }).done(function (data) {
             //alert("loaded!"+startFrom);
-            data = jQuery.parseJSON(data);
+            //data = jQuery.parseJSON(data);
             if (data.length > 0)
             {
                 // console.log(data);
@@ -105,13 +101,13 @@
 
     $(document).ready(function ()
     {
-        body.append(temp);
+        //body.append(temp);
         $(window).scroll(function()
         {
             // if(!bool)
             //alert("scroll");
             if(loadingComplete)
-                if (startFrom < @Model.ArticleList.TotalCount && !inProgress && $(window).scrollTop() >= $(document).height() - $(window).height() - 250)
+                if (startFrom < @Model.ArticleList.PageCount && !inProgress && $(window).scrollTop() >= $(document).height() - $(window).height() - 250)
                 {
                     //   alert("request articles!");
                     RequestArticles(false);
@@ -138,7 +134,7 @@
         }
         else loadingComplete = true;
         // alert("startfrom: "+ startFrom + "inprogress: " + inProgress);
-        if(startFrom < @Model.ArticleList.TotalCount && !inProgress && $(window).height() >= $(document).height())
+        if(startFrom < @Model.ArticleList.LinesCount && !inProgress && $(window).height() >= $(document).height())
         {
             //alert("requst!");
             RequestArticles(true);
@@ -149,7 +145,7 @@
         var destination = $(id).offset().top;
 
         $('body').animate({ scrollTop: destination }, 500);
-        //  $('html').animate({ scrollTop: destination }, 500);
+        $('html').animate({ scrollTop: destination }, 500);
     }
     function Redirect(id)
     {

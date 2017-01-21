@@ -12,7 +12,7 @@ namespace NewsWebSite
         public bool SaveOrUpdateArticleImage(string folderPath, HttpPostedFileBase image, int id)
         {
             var isChanged = true;
-            var filename = Path.GetFileName(image.FileName);
+            var fileName = Path.GetFileName(image.FileName);
             string userIdFolderPath = Path.Combine(folderPath, id.ToString());
 
             if (!(Directory.Exists(userIdFolderPath))) Directory.CreateDirectory(userIdFolderPath);
@@ -21,15 +21,15 @@ namespace NewsWebSite
                 var filesInDir = Directory.GetFiles(userIdFolderPath);
                 foreach (var f in filesInDir)
                 {
-                    var fileInfo = new FileInfo(f);
-                    var oldFileSize = fileInfo.Length;
+                    var FileInf = new FileInfo(f);
+                    var oldFileSize = FileInf.Length;
                     if (image.ContentLength == oldFileSize) isChanged = false;
                     else
                     File.Delete(f);
                 }
             }
             if(isChanged)
-            image.SaveAs(Path.Combine(userIdFolderPath, filename));
+            image.SaveAs(Path.Combine(userIdFolderPath, fileName));
             return isChanged; 
         }
     }

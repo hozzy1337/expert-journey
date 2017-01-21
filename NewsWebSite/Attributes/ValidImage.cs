@@ -9,29 +9,30 @@ namespace NewsWebSite.Attributes
 {
     public class ValidImage : ValidationAttribute
     {
+
+        //public ValidImage(int maxSizeMB)
+        //{
+        //    this.maxSizeMB = maxSizeMB;
+        //}
+
+        public int maxSizeMB { get; set; } = 4;
         public override bool IsValid(object value)
         {
-            //return false;
-            if (value == null) return false;
-            int maxContent = 5 * 1024 * 1024; //3 MB
-            string[] sAllowedExt = new string[] { ".jpg", ".png" };
+            if (value == null) return true;
 
 
+           
             var file = value as HttpPostedFileBase;
 
             if (file == null) return false;
-            if (!sAllowedExt.Contains(Path.GetExtension(file.FileName)))
-            {
-                ErrorMessage = "Please upload Your Photo of type: " + string.Join(", ", sAllowedExt);
-                return false;
-            }
+            int maxContent = maxSizeMB * 1024 * 1024;
             if (file.ContentLength > maxContent)
             {
-                ErrorMessage = "Your Photo is too large, maximum allowed size is : " + (maxContent / 1024).ToString() + "MB";
+                ErrorMessage = "Your Photo is too large, maximum allowed size is : " + maxSizeMB + "MB";
                 return false;
             }
-            
-                return true;
+
+            return true;
         }
     }
 }

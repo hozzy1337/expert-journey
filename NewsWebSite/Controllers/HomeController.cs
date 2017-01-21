@@ -17,8 +17,7 @@ namespace NewsWebSite.Controllers
 {
     public class HomeController : Controller
     {
-        const int NumberOfItemsOnPage = 15;
-        //const string UserImagesFolder = "~/Content/UserImages/";
+        readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
         readonly IRepository repo;
 
 
@@ -29,7 +28,8 @@ namespace NewsWebSite.Controllers
 
 
 
-        //создает тестовые записи в таблице, для дебага
+        #region ForDebug
+
         [HttpGet]
         public ActionResult CreateLines(int n = 0)
         {
@@ -38,15 +38,22 @@ namespace NewsWebSite.Controllers
             {
                 var a = new Article();
                 a.Title = i.ToString();
-                //a.CreateDate = DateTime.Now;
-                //a.LastUpdateDate = DateTime.Now;
-                repo.SaveOrUpdate(a);
+                a.FullDescription = a.Title;
+                repo.Save(a);
 
             }
             return Content("ok");
         }
-        //-------------------------------------------
 
+        #endregion
+
+
+        public ActionResult Index()
+        {
+            var list = repo.GetDemoList(0, NumberOfItemsOnPage);
+            var model = new ListItemPageModel(NumberOfItemsOnPage, list);
+            return View(model);
+        }
 
 
         [HttpGet]
@@ -60,10 +67,23 @@ namespace NewsWebSite.Controllers
             return HttpNotFound();
         }
 
+
         public ActionResult CreateArticle()
         {
             return View();
         }
+
+
+        [HttpPost]
+        public ActionResult CreateArticle(CreateArticleModel a)
+        {
+            if (!ModelState.IsValid) return View(a);
+            var id = repo.Save(new Article(a));
+            FIleHelper fileHelper = new FIleHelper();
+            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
+            return RedirectToAction("Article", new { Id = id });
+        }
+
 
         [HttpGet]
         public ActionResult EditArticle(int id = 0)
@@ -73,6 +93,7 @@ namespace NewsWebSite.Controllers
             if (article == null) return HttpNotFound();
             return View(new EditArticleModel(article));
         }
+
 
         [HttpPost]
         public ActionResult EditArticle(EditArticleModel edited)
@@ -92,52 +113,33 @@ namespace NewsWebSite.Controllers
                 }
             }
             if (edited.Title != null && baseArticle.Title != edited.Title)
-            {        
-                    baseArticle.Title = edited.Title;
-                    changesExist = true;
+            {
+                baseArticle.Title = edited.Title;
+                changesExist = true;
             }
             if (edited.FullDescription != null && baseArticle.FullDescription != edited.FullDescription)
             {
-                    baseArticle.FullDescription = edited.FullDescription;
-                    changesExist = true; 
+                baseArticle.FullDescription = edited.FullDescription;
+                changesExist = true;
             }
 
             if (changesExist)
-                repo.SaveOrUpdate(baseArticle);
+                repo.Save(baseArticle);
             return RedirectToAction("Article", new { Id = edited.Id });
         }
 
-        [HttpPost]
-        public ActionResult CreateArticle(CreateArticleModel a)
-        {
-            if (!ModelState.IsValid) return View(a);
-            var id = repo.SaveOrUpdate(a);
-            FIleHelper fileHelper = new FIleHelper();
-            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
-            return RedirectToAction("Article", new { Id = id });
-        }
 
-        [HttpGet]
-        public ActionResult Index()
-        {
-            var list = repo.GetDemoList(0, NumberOfItemsOnPage);
-            var model = new ListItemPageModel(NumberOfItemsOnPage, list);
-            return View(model);
-        }
+
+        #region ForAjaxRequests
 
         [HttpPost]
-        public ActionResult GetNewPageOfArticles(int Page)
+        public string GetArticles(int page = 1, int n = 1)
         {
-            if (Page < 1) return Content("");
-            var list = repo.GetDemoListJson(Page * NumberOfItemsOnPage, NumberOfItemsOnPage);
-            return Json(list);
+            if (page < 1) return "";
+            var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage);// as IList<DemoArticle>;
+            return JsonConvert.SerializeObject(lst);
         }
 
-        [HttpPost]
-        public ActionResult GetNPagesOfArticles(int n)
-        {
-            var list = repo.GetDemoListJson(NumberOfItemsOnPage, n * NumberOfItemsOnPage);
-            return Json(list);
-        }
+        #endregion
     }
 }

@@ -1,10 +1,12 @@
-﻿using NewsWebSite.Models.ViewModel;
+﻿using NewsWebSite.Controllers;
+using NewsWebSite.Models.ViewModel;
 using Newtonsoft.Json;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 
@@ -14,11 +16,9 @@ namespace NewsWebSite.Models
     {
         Article GetItem(int id);
         int GetCountOfLines();
-        IList<Article> GetList(int starFrom, int count);
+        PagedList<Article> GetList(int starFrom, int count);
         PagedList<DemoArticle> GetDemoList(int starFrom, int count);
-        int SaveOrUpdate(Article article);
-        int SaveOrUpdate(CreateArticleModel model);
-        string GetDemoListJson(int startFrom, int count);
+        int Save(Article article);
     }
 
     public class NHibernateRepository : IRepository
@@ -32,7 +32,7 @@ namespace NewsWebSite.Models
         }
       
 
-        public int SaveOrUpdate(Article a)
+        public int Save(Article a)
         {
             using (var session = sessionFactory.OpenSession())
             {
@@ -50,16 +50,6 @@ namespace NewsWebSite.Models
             }
         }
 
-       
-        public int SaveOrUpdate(CreateArticleModel model)
-        {
-            Article a = new Article();
-            a.Title = model.Title;
-            a.FullDescription = model.FullDescription;
-            a.Image = model.Image.FileName;
-            return SaveOrUpdate(a);
-        }
-
 
         public Article GetItem(int id)
         {
@@ -70,16 +60,19 @@ namespace NewsWebSite.Models
         }
 
 
-        public IList<Article> GetList(int starFrom = 0, int count = 10)
+        public PagedList<Article> GetList(int starFrom = 0, int count = 10)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var list = session.CreateCriteria<Article>()
+                var results = new PagedList<Article>();
+                    results.AddRange(session.CreateCriteria<Article>()
                     .SetFirstResult(starFrom)
                     .SetMaxResults(count)
                     .AddOrder(Order.Desc("Id"))
-                    .List<Article>();
-                return list;
+                    .List<Article>());
+                results.LinesCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
+                results.PageCount = (int)Math.Ceiling(results.LinesCount / double.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]));
+                return results;
             }
         }
 
@@ -102,16 +95,12 @@ namespace NewsWebSite.Models
                     .AddOrder(Order.Desc("Id"))
                     .SetResultTransformer(Transformers.AliasToBean<DemoArticle>())
                     .List<DemoArticle>());
-                results.TotalCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
+                results.LinesCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
+                results.PageCount = (int)Math.Ceiling(results.LinesCount / double.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]));
                 return results;
             }
         }
 
-        public string GetDemoListJson(int startFrom, int count)
-        {
-            var list = GetDemoList(startFrom, count);
-            return JsonConvert.SerializeObject(list);
-        }
 
         public int GetCountOfLines()
         {
@@ -122,7 +111,7 @@ namespace NewsWebSite.Models
             }
         }
     }
-
+    
     /* public class CachedRepository : IRepository
      {
          readonly IRepository _realRepo;
@@ -155,6 +144,7 @@ namespace NewsWebSite.Models
 
     public class PagedList<T> : List<T>
     {
-        public int TotalCount { get; set; }
+        public int LinesCount { get; set; }
+        public int PageCount { get; set; }
     }
 }
