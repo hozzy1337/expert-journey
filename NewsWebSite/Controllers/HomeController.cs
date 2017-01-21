@@ -78,7 +78,8 @@ namespace NewsWebSite.Controllers
         public ActionResult CreateArticle(CreateArticleModel a)
         {
             if (!ModelState.IsValid) return View(a);
-            var id = repo.Save(new Article(a));
+            Article newArticle = new Article(a.Title, a.FullDescription, a.Image.FileName);
+            var id = repo.Save(newArticle);
             FIleHelper fileHelper = new FIleHelper();
             fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
             return RedirectToAction("Article", new { Id = id });

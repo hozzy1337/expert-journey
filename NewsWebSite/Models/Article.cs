@@ -18,11 +18,11 @@ namespace NewsWebSite.Models
         public virtual DateTime CreateDate { get; set; }
         public virtual DateTime LastUpdateDate { get; set; }
 
-        public Article(CreateArticleModel model)
+        public Article(string title, string fulldescription, string image)
         {
-            Title = model.Title;
-            FullDescription = model.FullDescription;
-            Image = model.Image.FileName;
+            Title = title;
+            FullDescription = fulldescription;
+            Image = image;
         }
         public Article()
         {

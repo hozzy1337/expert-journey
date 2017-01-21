@@ -11,7 +11,8 @@ namespace NewsWebSite.Models
         public string Title { get; set; }
         public string FullDescription { get; set; }
         public string Image { get; set; }
-        public string DateMsg { get; set; }
+        public string CreateDate { get; set; }
+        public string UpdateDate { get; set; }
 
         public ArticleForView(Article a)
         {
@@ -19,7 +20,8 @@ namespace NewsWebSite.Models
             Title = a.Title;
             FullDescription = a.FullDescription;
             Image = a.Image;
-            DateMsg = "Created: " + a.CreateDate.ToString("dd/MM/yy H:mm") + (a.CreateDate != a.LastUpdateDate ? "<br/>Updated: " + a.LastUpdateDate.ToString("dd/MM/yy H:mm") : "");
+            CreateDate = a.CreateDate.ToString("R");
+            UpdateDate = (a.CreateDate != a.LastUpdateDate ? a.LastUpdateDate.ToString("R") : null);
         }
         public ArticleForView() { }
     }
