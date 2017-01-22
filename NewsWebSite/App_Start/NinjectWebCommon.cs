@@ -14,21 +14,22 @@ namespace NewsWebSite.App_Start
     using NHibernate;
     using NHibernate.Tool.hbm2ddl;
     using NHibernate.Cfg;
+    using Models.Repository;
 
-    public static class NinjectWebCommon 
+    public static class NinjectWebCommon
     {
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
 
         /// <summary>
         /// Starts the application
         /// </summary>
-        public static void Start() 
+        public static void Start()
         {
             DynamicModuleUtility.RegisterModule(typeof(OnePerRequestHttpModule));
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
             bootstrapper.Initialize(CreateKernel);
         }
-        
+
         /// <summary>
         /// Stops the application.
         /// </summary>
@@ -36,7 +37,7 @@ namespace NewsWebSite.App_Start
         {
             bootstrapper.ShutDown();
         }
-        
+
         /// <summary>
         /// Creates the kernel that will manage your application.
         /// </summary>
@@ -68,22 +69,18 @@ namespace NewsWebSite.App_Start
             kernel.Bind<IRepository>().To<NHibernateRepository>();
             kernel.Bind<ISessionFactory>().ToMethod(context =>
             {
-            
                 var configuration = new Configuration();
-                //todo: remove to web.config
-                var configurePath = HttpContext.Current.Server.MapPath(@"~\Models\NHibernate\Nhibernate.cfg.xml");
-                configuration.Configure(configurePath);
-                //Если бы не сделали Book.hbm.xml Embedded Resource, то он бы написал ошибку о невозможности найти файл
+
+                configuration.Configure();
                 configuration.AddAssembly(typeof(Article).Assembly);
 
-
                 ISessionFactory sessionFactory = configuration.BuildSessionFactory();
+
                 //Позволяет Nhibernate самому создавать в БД таблицу и поля к ним. 
-                // new SchemaExport(configuration).Execute()
                 new SchemaUpdate(configuration).Execute(true, true);
 
-                    return sessionFactory;
+                return sessionFactory;
             }).InSingletonScope();
-        }        
+        }
     }
 }

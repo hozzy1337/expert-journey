@@ -19,12 +19,14 @@ namespace NewsWebSite.Models.ViewModel
         public string Title { get; set; }
 
         [Display(Name = "Текст статьи")]
+        [DataType(DataType.MultilineText)]
         [StringLength(4000, ErrorMessage = "Description Max Length is 4000")]
         public string FullDescription { get; set; }
 
         [Display(Name = "Изображение")]
         [ValidImage(maxSizeMB = 5)]
         [AllowedExtensions(new string[] { ".jpg", ".png" })]
+        [DataType(DataType.Upload)]
         public HttpPostedFileBase Image { get; set; }
 
         public EditArticleModel(Article a)

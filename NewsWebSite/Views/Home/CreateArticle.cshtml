@@ -8,7 +8,8 @@
 @Scripts.Render("~/bundles/jqueryval")
 @using (Html.BeginForm("CreateArticle", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div>
+  
+     <div>
         @Html.LabelFor(model => Model.Title, new { @class = "DIMAS" })
         @Html.EditorFor(model => model.Title)
         @Html.ValidationMessageFor(model => model.Title)

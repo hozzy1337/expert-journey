@@ -18,6 +18,8 @@ namespace NewsWebSite.Controllers
     public class HomeController : Controller
     {
         readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
+
+
         readonly IRepository repo;
 
 
@@ -33,7 +35,7 @@ namespace NewsWebSite.Controllers
         [HttpGet]
         public ActionResult CreateLines(int n = 0)
         {
-            var session = NHibernateHelper.OpenSession();
+           
             for (int i = 1; i <= n; i++)
             {
                 var a = new Article();
@@ -81,7 +83,7 @@ namespace NewsWebSite.Controllers
             Article newArticle = new Article(a.Title, a.FullDescription, a.Image.FileName);
             var id = repo.Save(newArticle);
             FIleHelper fileHelper = new FIleHelper();
-            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), a.Image, id);
+            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), a.Image, id);
             return RedirectToAction("Article", new { Id = id });
         }
 
@@ -106,7 +108,7 @@ namespace NewsWebSite.Controllers
             if (edited.Image != null)
             {
                 var fileHelper = new FIleHelper();
-                var isChanged = fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"].ToString()), edited.Image, baseArticle.Id);
+                var isChanged = fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id);
                 if (isChanged)
                 {
                     baseArticle.Image = edited.Image.FileName;
@@ -123,16 +125,14 @@ namespace NewsWebSite.Controllers
                 baseArticle.FullDescription = edited.FullDescription;
                 changesExist = true;
             }
-
-            if (changesExist)
-                repo.Save(baseArticle);
+            if (changesExist) repo.Save(baseArticle);
             return RedirectToAction("Article", new { Id = edited.Id });
         }
 
 
 
         #region ForAjaxRequests
-
+       
         [HttpPost]
         public string GetArticles(int page = 1, int n = 1)
         {

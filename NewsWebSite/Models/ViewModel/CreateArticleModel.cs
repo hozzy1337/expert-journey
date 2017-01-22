@@ -18,6 +18,7 @@ namespace NewsWebSite.Models.ViewModel
 
         [Required]
         [Display(Name = "Текст статьи")]
+        [DataType(DataType.MultilineText)]
         [StringLength(5000, ErrorMessage = "Description Max Length is 5000")]
         public string FullDescription { get; set; }
 
@@ -25,6 +26,7 @@ namespace NewsWebSite.Models.ViewModel
         [Display(Name = "Изображение")]
         [ValidImage]
         [AllowedExtensions(new string[] {".jpg", ".png" })]
+        [DataType(DataType.Upload)]
         public HttpPostedFileBase Image { get; set; }
     }
 }
