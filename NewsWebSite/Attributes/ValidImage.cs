@@ -15,7 +15,7 @@ namespace NewsWebSite.Attributes
         //    this.maxSizeMB = maxSizeMB;
         //}
 
-        public int maxSizeMB { get; set; } = 4;
+        public int maxSizeMB { get; set; } = 4; //Max: 15
         public override bool IsValid(object value)
         {
             if (value == null) return true;
