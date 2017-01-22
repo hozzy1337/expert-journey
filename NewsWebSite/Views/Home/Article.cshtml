@@ -1,0 +1,20 @@
+﻿@using NewsWebSite.Models;
+@model ArticleForView
+@{
+    Layout = "~/Views/Shared/Lay.cshtml";
+}
+
+
+<div class="news_view">
+    <h2 class="news_head">@Model.Title</h2>
+    <a href="@Url.Action("EditArticle", new { Id = Model.Id })">EDIT</a>
+    <img class="FullItemImg" src="~/Content/UserImages/@Model.Id/@Model.Image" alt="SRC" style="max-height: 400px">
+    <p>@Model.FullDescription</p>
+    <div class="publicate_time">
+        <p>Created: @Model.CreateDate</p>
+        @if (Model.UpdateDate != null)
+        {
+            <p>Updated: @Model.UpdateDate</p>
+        }
+    </div>
+</div>

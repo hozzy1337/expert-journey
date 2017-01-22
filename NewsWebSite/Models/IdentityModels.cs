@@ -29,5 +29,7 @@ namespace NewsWebSite.Models
         {
             return new ApplicationDbContext();
         }
+
+        public System.Data.Entity.DbSet<NewsWebSite.Models.Article> Articles { get; set; }
     }
 }
