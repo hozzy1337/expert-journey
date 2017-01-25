@@ -19,6 +19,8 @@ namespace NewsWebSite.Models.Repository
         }
 
 
+
+
         public int Save(Article a)
         {
             using (var session = sessionFactory.OpenSession())
@@ -47,42 +49,59 @@ namespace NewsWebSite.Models.Repository
         }
 
 
-        public PagedList<Article> GetList(int starFrom = 0, int count = 10)
+        public PagedList<DemoArticle> GetArticlesBeforeCur(int id)
         {
-            using (var session = sessionFactory.OpenSession())
-            {
-                var results = new PagedList<Article>();
-                results.AddRange(session.CreateCriteria<Article>()
-                .SetFirstResult(starFrom)
-                .SetMaxResults(count)
-                .AddOrder(Order.Desc("Id"))
-                .List<Article>());
-                results.LinesCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
-                results.PageCount = (int)Math.Ceiling(results.LinesCount / double.Parse(System.Configuration.ConfigurationManager.AppSettings["NumberOfItemsOnPage"]));
-                return results;
-            }
+            return null;
         }
+        #region NotUsedNow
+        /* public PagedList<Article> GetList(int starFrom = 0, int count = 10)
+         {
+             using (var session = sessionFactory.OpenSession())
+             {
+                 var results = new PagedList<Article>();
+                 results.AddRange(session.CreateCriteria<Article>()
+                 .SetFirstResult(starFrom)
+                 .SetMaxResults(count)
+                 .AddOrder(Order.Desc("Id"))
+                 .List<Article>());
+                 results.LinesCount = session.QueryOver<Article>()
+                     .Select(Projections.RowCount())
+                     .FutureValue<int>()
+                     .Value;
+                 results.PageCount = (int)Math.Ceiling(results.LinesCount / double.Parse(System.Configuration.ConfigurationManager.AppSettings["NumberOfItemsOnPage"]));
+                 return results;
+             }
+         } */
+        #endregion
 
-
-        public PagedList<DemoArticle> GetDemoList(int starFrom = 0, int count = 10)
+        public PagedList<DemoArticle> GetDemoList(int starFrom = 0, int count = 10, int lastId = 0)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var results = new PagedList<DemoArticle>();
-
-                results.AddRange(session.CreateCriteria<Article>()
+                var creteria = session.CreateCriteria<Article>()
                     .SetProjection(Projections.ProjectionList()
                     .Add(Projections.Id(), "Id")
                     .Add(Projections.Property("Title"), "Title")
                     .Add(Projections.Property("Image"), "Image")
                     .Add(Projections.Property("CreateDate"), "CreateDate")
                     .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"))
-                    .SetFirstResult(starFrom)
-                    .SetMaxResults(count)
                     .AddOrder(Order.Desc("Id"))
+                    .SetMaxResults(count);
+
+                if (lastId > 0) creteria.Add(Restrictions.Lt("Id", lastId));
+                else creteria.SetFirstResult(starFrom);
+
+                var results = new PagedList<DemoArticle>();
+
+                results.AddRange(creteria
                     .SetResultTransformer(Transformers.AliasToBean<DemoArticle>())
                     .List<DemoArticle>());
-                results.LinesCount = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
+
+                results.LinesCount = session.QueryOver<Article>()
+                    .Select(Projections.RowCount())
+                    .FutureValue<int>()
+                    .Value;
+
                 results.PageCount = (int)Math.Ceiling(results.LinesCount / double.Parse(System.Configuration.ConfigurationManager.AppSettings["NumberOfItemsOnPage"]));
                 return results;
             }

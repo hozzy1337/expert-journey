@@ -15,7 +15,7 @@ using System.Configuration;
 
 namespace NewsWebSite.Controllers
 {
-    public class HomeController : Controller
+    public class NewsController : Controller
     {
         readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
 
@@ -23,7 +23,7 @@ namespace NewsWebSite.Controllers
         readonly IRepository repo;
 
 
-        public HomeController(IRepository repo)
+        public NewsController(IRepository repo)
         {
             this.repo = repo;
         }
@@ -49,10 +49,10 @@ namespace NewsWebSite.Controllers
 
         #endregion
 
-
+        [HttpGet]
         public ActionResult Index()
         {
-            var list = repo.GetDemoList(0, NumberOfItemsOnPage);
+            var list = repo.GetDemoList(0, NumberOfItemsOnPage, 0);
             var model = new ListItemPageModel(NumberOfItemsOnPage, list);
             return View(model);
         }
@@ -69,7 +69,7 @@ namespace NewsWebSite.Controllers
             return HttpNotFound();
         }
 
-
+        [HttpGet]
         public ActionResult CreateArticle()
         {
             return View();
@@ -134,10 +134,10 @@ namespace NewsWebSite.Controllers
         #region ForAjaxRequests
        
         [HttpPost]
-        public string GetArticles(int page = 1, int n = 1)
+        public string GetArticles(int page = 1, int n = 1, int lastId = 0)
         {
             if (page < 1) return "";
-            var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage);// as IList<DemoArticle>;
+            var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId);// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
         }
 

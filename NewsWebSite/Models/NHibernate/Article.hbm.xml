@@ -10,5 +10,6 @@
     <property name="Image" />
     <property name="CreateDate" />
     <property name="LastUpdateDate" />
+    <property name="UserId" />
   </class>
 </hibernate-mapping>
