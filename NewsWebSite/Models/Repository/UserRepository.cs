@@ -16,7 +16,7 @@ namespace NewsWebSite.Models.Repository
             this.sessionFactory = sessionFactory;
         }
 
-        public string Save(User u)
+        public int Save(User u)
         {
             using (var session = sessionFactory.OpenSession())
             {
@@ -28,7 +28,7 @@ namespace NewsWebSite.Models.Repository
                 }
             }
         }
-        public User GetById(string Id)
+        public User GetById(int Id)
         {
             using (var session = sessionFactory.OpenSession())
             {
@@ -39,7 +39,7 @@ namespace NewsWebSite.Models.Repository
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var user = session.CreateCriteria<User>().Add(Restrictions.Eq("UserName", name)).List<User>()[0];
+                var user = session.CreateCriteria<User>().Add(Restrictions.Eq("UserName", name)).UniqueResult<User>();
                 return user;
                 // return session.Get<User>(Id);
             }

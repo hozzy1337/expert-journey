@@ -227,7 +227,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="FIleHelper.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -261,7 +260,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <EmbeddedResource Include="Models\NHibernate\Article.hbm.xml" />
-    <Content Include="Models\NHibernate\User.hbm.xml" />
+    <EmbeddedResource Include="Models\NHibernate\User.hbm.xml" />
     <Content Include="Scripts\ai.0.22.19-build00125.js" />
     <Content Include="Scripts\ai.0.22.19-build00125.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -328,7 +327,6 @@
     <Content Include="Views\News\CreateArticle.cshtml" />
     <Content Include="Views\News\Article.cshtml" />
     <Content Include="Views\Shared\Lay.cshtml" />
-    <Content Include="Views\Shared\View.cshtml" />
     <Content Include="Views\News\EditArticle.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\ImageUpload.cshtml" />
     <Content Include="Views\News\Registration.cshtml" />

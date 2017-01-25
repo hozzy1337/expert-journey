@@ -4,8 +4,7 @@
     Layout = "~/Views/Shared/Lay.cshtml";
 }
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/jqueryval")
+
 <div class="news-create">
     <header><h3>РЕДАКТИРОВАНИЕ НОВОСТИ</h3></header>
     @using (Html.BeginForm("EditArticle", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -27,11 +26,16 @@
     }
 </div>
 
+@section scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
 
 
 @*@Html.ValidationSummary()*@
 
-  @*  <form method="post" enctype="multipart/form-data">
+@*  <form method="post" enctype="multipart/form-data">
         <div><img src="~/Content/UserImages/@Model.Id/@Model.Image" class="EditImg" alt="IMG"></div>
         <table>
             <input type="hidden" name="Id" value="@Model.Id"  />

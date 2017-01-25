@@ -3,8 +3,7 @@
 @{
     Layout = "~/Views/Shared/Lay.cshtml";
 }
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/jqueryval")
+
 <div class="news-create">
     <header><h3>СОЗДАНИЕ НОВОСТИ</h3></header>
     @using (Html.BeginForm("CreateArticle", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -25,10 +24,15 @@
     }
 </div>
 
+@section scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
 
 @*
     1.data
     2. bl
     3,. ui
-    *@
+*@
 

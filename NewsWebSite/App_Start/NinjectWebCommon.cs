@@ -15,6 +15,9 @@ namespace NewsWebSite.App_Start
     using NHibernate.Tool.hbm2ddl;
     using NHibernate.Cfg;
     using Models.Repository;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.Owin;
+    using Microsoft.Owin.Security;
 
     public static class NinjectWebCommon
     {
@@ -67,7 +70,14 @@ namespace NewsWebSite.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IRepository>().To<NHibernateRepository>();
-            kernel.Bind<ISessionFactory>().ToMethod(context =>
+            kernel.Bind<IUserRepository>().To<UserRepository>();
+            kernel.Bind<UserManager<User, int>>().To<UserManager<User, int>>();
+            kernel.Bind<SignInManager<User, int>>().To<SignInManager<User, int>>();
+            kernel.Bind<IUserStore<User, int>>().To<CustomUserStore>();
+            kernel.Bind<IAuthenticationManager>().ToMethod(_ => HttpContext.Current.GetOwinContext().Authentication);
+            
+
+                kernel.Bind<ISessionFactory>().ToMethod(context =>
             {
                 var configuration = new Configuration();
 

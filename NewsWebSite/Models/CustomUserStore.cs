@@ -8,7 +8,7 @@ using System.Web;
 
 namespace NewsWebSite.Models
 {
-    public class CustomUserStore : IUserStore<User>
+    public class CustomUserStore : IUserStore<User, int>, IUserPasswordStore<User, int>, IUserLockoutStore<User, int>
     {
         readonly IUserRepository repository;
         public CustomUserStore(IUserRepository repository)
@@ -23,15 +23,14 @@ namespace NewsWebSite.Models
 
         public Task DeleteAsync(User user)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(true);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public Task<User> FindByIdAsync(string userId)
+        public Task<User> FindByIdAsync(int userId)
         {
             return Task.FromResult(repository.GetById(userId));
         }
@@ -39,6 +38,61 @@ namespace NewsWebSite.Models
         public Task<User> FindByNameAsync(string userName)
         {
             return Task.FromResult(repository.FindByName(userName));
+        }
+
+        public Task<int> GetAccessFailedCountAsync(User user)
+        {
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        public Task<bool> GetLockoutEnabledAsync(User user)
+        {
+            return Task.FromResult(user.LockoutEnabled);
+        }
+
+        public Task<DateTimeOffset> GetLockoutEndDateAsync(User user)
+        {
+            return Task.FromResult(user.lockoutEnd);
+        }
+
+        public Task<string> GetPasswordHashAsync(User user)
+        {
+            return Task.FromResult(user.Password);
+        }
+
+        public Task<bool> HasPasswordAsync(User user)
+        {
+            return Task.FromResult(string.IsNullOrEmpty(user.Password));
+        }
+
+        public Task<int> IncrementAccessFailedCountAsync(User user)
+        {
+            return Task.FromResult(--user.AccessFailedCount);
+        }
+
+        public Task ResetAccessFailedCountAsync(User user)
+        {
+            user.AccessFailedCount = 0;
+            return Task.FromResult(true);
+
+        }
+
+        public Task SetLockoutEnabledAsync(User user, bool enabled)
+        {
+            user.LockoutEnabled = enabled;
+            return Task.FromResult(true);
+        }
+
+        public Task SetLockoutEndDateAsync(User user, DateTimeOffset lockoutEnd)
+        {
+            user.lockoutEnd = lockoutEnd;
+            return Task.FromResult(true);
+        }
+
+        public Task SetPasswordHashAsync(User user, string passwordHash)
+        {
+            user.Password = passwordHash;
+            return Task.FromResult(true);
         }
 
         public Task UpdateAsync(User user)

@@ -7,20 +7,22 @@
     @Styles.Render("https://fonts.googleapis.com/css?family=EB+Garamond")
     @Styles.Render("https://fonts.googleapis.com/css?family=El+Messiri|Rubik+One")
     @Styles.Render("https://fonts.googleapis.com/css?family=Scada")
-    @Scripts.Render("~/Scripts/jquery-3.1.1.js")
-    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+
     <title>News Portal</title>
 </head>
 <body>
     <div id="login-form" class="login-window">
-        <form method="post" action="">
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
             <label for="Email">Почтовый адресс</label>
             <input type="text" name="Email" id="Email">
             <label for="Password">Пароль</label>
             <input type="password" name="Password" id="Password">
             <input type="submit" value="ВОЙТИ">
             <a href="@Url.Action("UserRegistration")">ЗАРЕГИСТРИРОВАТЬСЯ</a>
-        </form>
+        }
         @*@using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.Label(ViewBag.Login.Email)
@@ -39,8 +41,16 @@
             <nav class="main-menu">
                 <ul>
                     <li><a href="@Url.Action("Index")">главная</a></li>
-                    <li><a href="@Url.Action("CreateArticle")">создать новость</a></li>
-                    <li><a id="loged-button" href="">войти</a></li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><a href="@Url.Action("CreateArticle")">создать новость</a></li>
+                       
+                            <li><a href="@Url.Action("LogOff", "Account")">выйти</a></li>
+                    }
+                    else
+                    {
+                        <li><a id="loged-button" href="">войти</a></li>
+                    }
                 </ul>
             </nav>
             <form action="" method="get">
@@ -81,6 +91,10 @@
             </div>
         </div>
     </div>
+
+
+    @Scripts.Render("~/Scripts/jquery-3.1.1.js")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
     <script>
         $(document).ready(function () {
             $("#loged-button").click(function (e) {
@@ -97,29 +111,29 @@
             });
         });
     </script>
-</body>
-@RenderSection("scripts", required: false)
-<!-- Строка поиск-->
-<script>
-    $("#search-submit").click(ShowSearh);
-    function ShowSearh(){
-        if(!$("[type=search]").hasClass("hidden"))
-        {
-            $("[type=search]").addClass("hidden");
-            $("nav").removeClass("hidden");
-        }
-        else {
-            $("[type=search]").removeClass("hidden");
-            $("nav").addClass("hidden");
-        }
-    }
-</script>
-<!-- Прилипание сайдбара-->
-<script>
-    $(window).on("scroll", function() {
-        if ($(window).scrollTop() > 275){ $('.left').addClass('fixed'); $('.right').addClass('right-content'); $('#to-up').removeClass('hidden');}
-        else {$('.left').removeClass('fixed');$('.right').removeClass('right-content'); $('#to-up').addClass('hidden');}
-    });
-</script>
-</html>
 
+    <script>
+        $("#search-submit").click(ShowSearh);
+        function ShowSearh() {
+            if (!$("[type=search]").hasClass("hidden")) {
+                $("[type=search]").addClass("hidden");
+                $("nav").removeClass("hidden");
+            }
+            else {
+                $("[type=search]").removeClass("hidden");
+                $("nav").addClass("hidden");
+            }
+        }
+    </script>
+    <!-- Прилипание сайдбара-->
+    <script>
+        $(window).on("scroll", function () {
+            if ($(window).scrollTop() > 275) { $('.left').addClass('fixed'); $('.right').addClass('right-content'); $('#to-up').removeClass('hidden'); }
+            else { $('.left').removeClass('fixed'); $('.right').removeClass('right-content'); $('#to-up').addClass('hidden'); }
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+<!-- Строка поиск-->
+
+</html>

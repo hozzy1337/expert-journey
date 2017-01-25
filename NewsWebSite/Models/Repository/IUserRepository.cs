@@ -7,9 +7,9 @@ namespace NewsWebSite.Models.Repository
 {
     public interface IUserRepository
     {
-        string Save(User u);
+        int Save(User u);
 //        void Update(User u);
-        User GetById(string id);
+        User GetById(int id);
         User FindByName(string name);
 
     }
