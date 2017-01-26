@@ -7,7 +7,6 @@
     @Styles.Render("https://fonts.googleapis.com/css?family=EB+Garamond")
     @Styles.Render("https://fonts.googleapis.com/css?family=El+Messiri|Rubik+One")
     @Styles.Render("https://fonts.googleapis.com/css?family=Scada")
-
     <title>News Portal</title>
 </head>
 <body>
@@ -20,8 +19,10 @@
             <input type="text" name="Email" id="Email">
             <label for="Password">Пароль</label>
             <input type="password" name="Password" id="Password">
+            <label for="RememberMe">Запомнить меня</label>
+            <input type="checkbox" name="RememberMe" id="remember" /><br />
             <input type="submit" value="ВОЙТИ">
-            <a href="@Url.Action("UserRegistration")">ЗАРЕГИСТРИРОВАТЬСЯ</a>
+            <a href="@Url.Action("Register", "Account")">ЗАРЕГИСТРИРОВАТЬСЯ</a>
         }
         @*@using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
@@ -40,12 +41,11 @@
             </div>
             <nav class="main-menu">
                 <ul>
-                    <li><a href="@Url.Action("Index")">главная</a></li>
+                    <li><a href="@Url.Action("Index", "News")">главная</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li><a href="@Url.Action("CreateArticle")">создать новость</a></li>
-                       
-                            <li><a href="@Url.Action("LogOff", "Account")">выйти</a></li>
+                        <li><a href="@Url.Action("CreateArticle", "News")">создать новость</a></li>
+                        <li><a href="@Url.Action("LogOff", "Account")">выйти (@User.Identity.Name)</a></li>
                     }
                     else
                     {
@@ -92,7 +92,6 @@
         </div>
     </div>
 
-
     @Scripts.Render("~/Scripts/jquery-3.1.1.js")
     @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
     <script>
@@ -111,7 +110,6 @@
             });
         });
     </script>
-
     <script>
         $("#search-submit").click(ShowSearh);
         function ShowSearh() {
@@ -135,5 +133,4 @@
     @RenderSection("scripts", required: false)
 </body>
 <!-- Строка поиск-->
-
 </html>

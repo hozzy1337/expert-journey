@@ -19,8 +19,13 @@ namespace NewsWebSite.Models.ViewModel
         [Required]
         [Display(Name = "Текст статьи")]
         [DataType(DataType.MultilineText)]
-        [StringLength(5000, ErrorMessage = "Description Max Length is 5000")]
+        [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
         public string FullDescription { get; set; }
+
+        [Required]
+        [Display(Name = "Теги статьи")]
+        [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
+        public string Tags { get; set; }
 
         [Required]
         [Display(Name = "Изображение")]

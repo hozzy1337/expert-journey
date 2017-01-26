@@ -16,9 +16,7 @@ namespace NewsWebSite.Models
     {
         Article GetItem(int id);
         int GetCountOfLines();
-     //   PagedList<Article> GetList(int starFrom, int count);
-        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId);
-        PagedList<DemoArticle> GetArticlesBeforeCur(int id);
+        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] tagList, int userId);
         int Save(Article article);
     }
 

@@ -20,8 +20,12 @@ namespace NewsWebSite.Models.ViewModel
 
         [Display(Name = "Текст статьи")]
         [DataType(DataType.MultilineText)]
-        [StringLength(4000, ErrorMessage = "Description Max Length is 4000")]
+        [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
         public string FullDescription { get; set; }
+
+        [Display(Name = "Теги статьи")]
+        [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
+        public string Tags { get; set; }
 
         [Display(Name = "Изображение")]
         [ValidImage(maxSizeMB = 5)]
@@ -34,12 +38,10 @@ namespace NewsWebSite.Models.ViewModel
             Id = a.Id;
             Title = a.Title;
             FullDescription = a.FullDescription;
+            Tags = (new TagsHelper()).GetLineToShow(a.Tags);
         }
         public EditArticleModel()
         {
-            Title = null;
-            FullDescription = null;
-            Image = null;
         }
     }
 }

@@ -71,9 +71,9 @@ namespace NewsWebSite.App_Start
         {
             kernel.Bind<IRepository>().To<NHibernateRepository>();
             kernel.Bind<IUserRepository>().To<UserRepository>();
-            kernel.Bind<UserManager<User, int>>().To<UserManager<User, int>>();
-            kernel.Bind<SignInManager<User, int>>().To<SignInManager<User, int>>();
-            kernel.Bind<IUserStore<User, int>>().To<CustomUserStore>();
+            kernel.Bind<UserManager<AppUser, int>>().To<UserManager<AppUser, int>>();
+            kernel.Bind<SignInManager<AppUser, int>>().To<SignInManager<AppUser, int>>();
+            kernel.Bind<IUserStore<AppUser, int>>().To<CustomUserStore>();
             kernel.Bind<IAuthenticationManager>().ToMethod(_ => HttpContext.Current.GetOwinContext().Authentication);
             
 

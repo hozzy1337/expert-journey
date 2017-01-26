@@ -7,10 +7,11 @@ namespace NewsWebSite.Models.Repository
 {
     public interface IUserRepository
     {
-        int Save(User u);
-//        void Update(User u);
-        User GetById(int id);
-        User FindByName(string name);
+        int Save(AppUser u);
+        AppUser GetById(int id);
+        AppUser FindByName(string name);
+        bool IsUserWhithUserNameOrEmailExist(string userName, string email);
+
 
     }
 }

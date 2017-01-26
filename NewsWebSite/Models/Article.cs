@@ -18,12 +18,15 @@ namespace NewsWebSite.Models
         public virtual DateTime CreateDate { get; set; }
         public virtual DateTime LastUpdateDate { get; set; }
         public virtual int UserId { get; set; }
+        public virtual string Tags { get; set; }
 
-        public Article(string title, string fulldescription, string image)
+        public Article(string title, string fulldescription, string image, string tags, int userId)
         {
             Title = title;
             FullDescription = fulldescription;
             Image = image;
+            Tags = tags;
+            UserId = userId;
         }
         public Article()
         {

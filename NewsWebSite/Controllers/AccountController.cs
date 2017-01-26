@@ -10,6 +10,8 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NewsWebSite.Models;
 using NewsWebSite.Models.Default;
+using NewsWebSite.Models.Repository;
+using NewsWebSite.Models.ViewModel;
 
 namespace NewsWebSite.Controllers
 {
@@ -23,14 +25,15 @@ namespace NewsWebSite.Controllers
         {
         }
 
-        public AccountController(UserManager<User, int> userManager, SignInManager<User, int> signInManager)
+        public AccountController(UserManager<AppUser, int> userManager, SignInManager<AppUser, int> signInManager, IUserRepository repo)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            this.repo = repo;
         }
-
-        public SignInManager<User, int> SignInManager { get; private set; }
-        public UserManager<User, int> UserManager { get; private set; }
+        readonly IUserRepository repo;
+        readonly SignInManager<AppUser, int> SignInManager;
+        readonly UserManager<AppUser, int> UserManager;
 
         //
         // GET: /Account/Login
@@ -46,7 +49,7 @@ namespace NewsWebSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -55,15 +58,17 @@ namespace NewsWebSite.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+          //  var user = new AppUser { UserName = model.Email, Email = model.Email, Password = model.Password };
+            var result = //SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+            await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("Index", "News");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                //case SignInStatus.RequiresVerification:
+                //    return RedirectToAction("SendCode", new { ReturnUrl = "", RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
@@ -131,7 +136,12 @@ namespace NewsWebSite.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.UserName, Email = model.Email };
+            //    if (!repo.IsUserWhithUserNameOrEmailExist(model.UserName, model.Email))
+            //    {
+            //        ModelState.AddModelError("UserName", "Email And Username must be uniq");
+            //        return View(model);
+            //    }
+                    var user = new AppUser { UserName = model.UserName, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -347,7 +357,7 @@ namespace NewsWebSite.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new User { UserName = model.Email, Email = model.Email };
+                var user = new AppUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {

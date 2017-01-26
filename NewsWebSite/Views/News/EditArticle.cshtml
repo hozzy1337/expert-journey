@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/Lay.cshtml";
 }
 
-
 <div class="news-create">
     <header><h3>РЕДАКТИРОВАНИЕ НОВОСТИ</h3></header>
     @using (Html.BeginForm("EditArticle", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -18,6 +17,10 @@
         @Html.EditorFor(model => model.FullDescription)
         @Html.ValidationMessageFor(model => model.FullDescription)
 
+        @Html.LabelFor(model => model.Tags, new { @class = "label-text" })
+        @Html.EditorFor(model => model.Tags)
+        @Html.ValidationMessageFor(model => model.Tags)
+
         @Html.LabelFor(model => model.Image, new { @class = "label-text" })
         @Html.TextBoxFor(model => model.Image, new { type = "file", accept = "image/jpeg,image/png,.jpg,.png" })
         @Html.ValidationMessageFor(model => model.Image)
@@ -25,16 +28,12 @@
         <input type="submit" value="ОПУБЛИКОВАТЬ" name="accept">
     }
 </div>
-
 @section scripts {
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
 }
 
-
-
 @*@Html.ValidationSummary()*@
-
 @*  <form method="post" enctype="multipart/form-data">
         <div><img src="~/Content/UserImages/@Model.Id/@Model.Image" class="EditImg" alt="IMG"></div>
         <table>
@@ -54,6 +53,4 @@
         </table>
     </form>
 *@
-
-
 
