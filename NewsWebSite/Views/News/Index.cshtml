@@ -1,0 +1,198 @@
+﻿@using NewsWebSite.Models.ViewModel
+@model ListItemPageModel
+@{
+    Layout = "~/Views/Shared/Lay.cshtml";
+}
+
+<div id="news_panel">
+    @foreach (var a in Model.ArticleList)
+    {
+        <div class="news-item" id="@a.Id">
+            <div class="news-img"><img src="~/Content/UserImages/@a.Id/@a.Image" alt="IMG"></div>
+            <p class="upload-time">@a.LastUpdateDate</p>
+            <h3><a id="Title-@a.Id" href="@Url.Action("Article", new {Id = a.Id})" onclick="Redirect(@a.Id);">@a.Title</a></h3>
+            <a id="More-@a.Id" href="@Url.Action("Article", new {Id = a.Id})" onclick="Redirect(@a.Id);">ПОДРОБНЕЕ</a>
+        </div>
+    }
+</div>
+@section scripts {
+    <script type="text/javascript">
+    // var temp = $('#template').Inner
+
+    var id = 0;
+     var LastId = @(Model.ArticleList.Count > 0 ? Model.ArticleList[Model.ArticleList.Count - 1].Id : 0);
+    var loadingComplete = false;
+    //var bool = false;
+    var inProgress = false;
+    var startFrom = 1;
+
+
+    function RequestArticles() {
+      //  alert(startFrom);
+        $.ajax({
+            url: '/News/GetArticles',
+            timeout: 3000,
+            method: 'POST',
+            dataType: 'Json',
+            async: true,
+            data: { "Page": startFrom, "lastId": LastId},
+            beforeSend: function () {
+                inProgress = true;
+            }
+        }).done(function (data) {
+            //  console.log(data);
+            console.log(data);
+            console.log(startFrom);
+            console.log("lastid: " + LastId)
+            // data = jQuery.parseJSON(data);
+            var firstid = 0;
+            if (data.length > 0) {
+                firstid =data[0].Id;
+                //console.log(data);
+                // location.hash
+                $.each(data, function (index, data) {
+                   // $("#news_panel").append("<div id =\"btn-" + data.Id +"\" class=\"news_item\"><h3><a id =\"btn-" + data.Id +"\" href=\"News/Article?id=" + data.Id+ "\" onclick=\"Redirect(" + data.Id +");\">" + data.Title + "</a></h3><span class=\"time\">" + data.CreateDate +"</span> <div><img alt=\"IMG\" class=\"images\" src=\"~/Content/UserImages/"+data.Id+"/" + data.Image +"\"/></div>");
+                    //var temp = $('#template').text;
+                    var templ = ($("#template").html().split("[Id]").join(data.Id));
+                    templ = templ.split("[Image]").join(data.Image);
+                    templ = templ.split("[Title]").join(data.Title);
+                    templ = templ.split("[Date]").join(data.CreateDate.replace("T"," "));
+                    $('#news_panel').append(templ);
+                    //$('Title-' + data.Id).addEventListener( "click" , function() {Redirect(data.Id);});
+                    //$('More-' + data.Id).addEventListener( "click" , function() {Redirect(data.Id);});
+                });
+                 LastId = data[data.length-1].Id;
+
+            }
+            startFrom ++;
+            location.hash=startFrom-1+':'+firstid;
+            inProgress = false;
+        });
+    }
+    function GetNPagesOfArticles(page)
+    {
+       // alert("GetNPagesOfArticles");
+        $.ajax({
+            url: '/News/GetArticles',
+            timeout: 3000,
+            method: 'POST',
+            dataType: 'Json',
+            async: true,
+            data: { "n": startFrom + 1, "lastId": LastId  },
+            beforeSend: function () {
+                inProgress = true;
+            }
+        }).done(function (data) {
+            //alert("loaded!"+startFrom);
+            //data = jQuery.parseJSON(data);
+            if (data.length > 0)
+            {
+                // console.log(data);
+
+                $.each(data, function (index, data) {
+
+                    // $("#news_panel").append("<div id =\"btn-" + data.Id +"\" class=\"news_item\"><h3><a href=\"News/Article?id=" + data.Id+ "\" onclick=\"Redirect(" + data.Id +");\">" + data.Title + "</a></h3><span class=\"time\">" + data.CreateDate +"</span> <div><img alt=\"IMG\" class=\"images\" src=\"~/Content/UserImages/"+data.Id+"/" + data.Image +"\"/></div>");
+                    var templ = ($("#template").html().split("[Id]").join(data.Id));
+                    templ = templ.split("[Image]").join(data.Image);
+                    templ = templ.split("[Title]").join(data.Title);
+                    templ = templ.split("[Date]").join(data.CreateDate.replace("T"," "));
+                    $('#news_panel').append(templ);
+                    //$('Title-' + data.Id).addEventListener( "click" , function() {Redirect(data.Id);});
+                    //$('More-' + data.Id).addEventListener( "click" , function() {Redirect(data.Id);});
+
+
+
+                });
+
+
+            }
+
+            startFrom = page + 1;
+            inProgress = false;
+            if(id>0)
+            {
+               // console.log("id " + id )
+                ScrollTo(id);
+            }
+            //ScrollTo('#btn-' + id);
+        });
+
+    }
+
+
+    $(document).ready(function ()
+    {
+
+      //  alert("l");
+        //body.append(temp);
+        $(window).scroll(function()
+        {
+            // if(!bool)
+            //alert("scroll");
+            if(loadingComplete)
+                if (startFrom < @Model.ArticleList.PageCount && !inProgress && $(window).scrollTop() >= $(document).height() - $(window).height() - 250)
+                {
+                    //   alert("request articles!");
+                    RequestArticles();
+                }
+        });
+
+        var page = 0;
+        if (location.hash.length > 0)
+        {
+            var string = location.hash.replace('#','');
+            var arr = string.split(':');
+            page = arr[0];
+            id = arr[1];
+
+        }
+        // alert("id: " + id +" page: " + page);
+        if(id > 0 && page > 0)
+        {
+            GetNPagesOfArticles(page - 1);
+
+
+
+
+        }
+        loadingComplete = true;
+        // alert("startfrom: "+ startFrom + "inprogress: " + inProgress);
+        if(startFrom < @Model.ArticleList.LinesCount && !inProgress && $(window).height() >= $(document).height())
+        {
+            //alert("requst!");
+            RequestArticles(true);
+        }
+    });
+    function ScrollTo(ide)
+    {
+        console.log(ide);
+        var destination = $(ide).offset().top;
+       // console.log(destination);
+        //console.log("scroll");
+        $('body').animate({ scrollTop: destination }, 1000);
+        //$('html').animate({ scrollTop: destination }, 1000);
+    }
+    function Redirect(id)
+    {
+
+        location.hash = startFrom + ':' +id;
+    }
+    </script>
+
+
+
+
+    <script type="text/template" id="template">
+        @*<div class="news_item">
+                <h3><a id="[Id]" href="Home/Article?Id=[Id]" onclick="Redirect([Id]);">[Title]</a></h3>
+                <span class="time">[Date]</span>
+                <div><img alt="IMG" class="images" src="~/Content/UserImages/[Id]/[Image]"></div>
+            </div>*@
+        <div class="news-item">
+            <div class="news-img"><img src="~/Content/UserImages/[Id]/[Image]" class="images" alt="IMG"></div>
+            <p class="upload-time">[Date]</p>
+            <h3><a id="Title-[Id]" href="Home/Article?Id=[Id]" onclick="Redirect([Id])">[Title]</a></h3>
+            <a id="More-[Id]" href="Home/Article?Id=[Id]" onclick="Redirect([Id])">ПОДРОБНЕЕ</a>
+        </div>
+    </script>
+}

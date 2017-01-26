@@ -1,0 +1,38 @@
+﻿@using NewsWebSite.Models.ViewModel
+@model CreateArticleModel
+@{
+    Layout = "~/Views/Shared/Lay.cshtml";
+}
+
+<div class="news-create">
+    <header><h3>СОЗДАНИЕ НОВОСТИ</h3></header>
+    @using (Html.BeginForm("CreateArticle", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.LabelFor(model => Model.Title, new { @class = "label-text" })
+        @Html.EditorFor(model => model.Title)
+        @Html.ValidationMessageFor(model => model.Title)
+
+        @Html.LabelFor(model => Model.FullDescription, new { @class = "label-text" })
+        @Html.EditorFor(model => model.FullDescription)
+        @Html.ValidationMessageFor(model => model.FullDescription)
+
+        @Html.LabelFor(model => Model.Image, new { @class = "label-text" })
+        @Html.TextBoxFor(model => model.Image, new { type = "file", accept = "image/jpeg,image/png,.jpg,.png" })
+        @Html.ValidationMessageFor(model => model.Image)
+
+        <input type="submit" value="ОПУБЛИКОВАТЬ" name="accept">
+    }
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+@*
+    1.data
+    2. bl
+    3,. ui
+*@
+
