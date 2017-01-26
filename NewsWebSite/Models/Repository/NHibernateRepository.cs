@@ -12,14 +12,10 @@ namespace NewsWebSite.Models.Repository
     {
         readonly ISessionFactory sessionFactory;
 
-
         public NHibernateRepository(ISessionFactory sessionFactory)
         {
             this.sessionFactory = sessionFactory;
         }
-
-
-
 
         public int Save(Article a)
         {
@@ -34,11 +30,9 @@ namespace NewsWebSite.Models.Repository
                     session.SaveOrUpdate(a);
                     t.Commit();
                     return a.Id;
-
                 }
             }
         }
-
 
         public Article GetItem(int id)
         {
@@ -48,11 +42,6 @@ namespace NewsWebSite.Models.Repository
             }
         }
 
-
-        public PagedList<DemoArticle> GetArticlesBeforeCur(int id)
-        {
-            return null;
-        }
         #region NotUsedNow
         /* public PagedList<Article> GetList(int starFrom = 0, int count = 10)
          {
@@ -74,7 +63,7 @@ namespace NewsWebSite.Models.Repository
          } */
         #endregion
 
-        public PagedList<DemoArticle> GetDemoList(int starFrom = 0, int count = 10, int lastId = 0)
+        public PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] taglist, int userId)
         {
             using (var session = sessionFactory.OpenSession())
             {
@@ -87,7 +76,17 @@ namespace NewsWebSite.Models.Repository
                     .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"))
                     .AddOrder(Order.Desc("Id"))
                     .SetMaxResults(count);
-
+                if (userId > 0)
+                {
+                    creteria.Add(Restrictions.Eq("UserId", userId));
+                }
+                if (taglist != null)
+                {
+                    foreach (var t in taglist)
+                    {
+                        if (t != "") creteria.Add(Restrictions.Like("Tags", "," + t + ",", MatchMode.Anywhere));
+                    }
+                }
                 if (lastId > 0) creteria.Add(Restrictions.Lt("Id", lastId));
                 else creteria.SetFirstResult(starFrom);
 
@@ -115,6 +114,21 @@ namespace NewsWebSite.Models.Repository
                 var count = session.QueryOver<Article>().Select(Projections.RowCount()).FutureValue<int>().Value;
                 return count;
             }
+        }
+    }
+
+    public class NewsCriteria
+    {
+        public int StartFrom { get; set; }
+        public int Count { get; set; }
+        public int LastId { get; set; }
+        public string[] Tags { get; set; }
+        public int UserId { get; set; }
+
+        public NewsCriteria()
+        {
+            Tags = new string[0];
+            Count = 10;
         }
     }
 }

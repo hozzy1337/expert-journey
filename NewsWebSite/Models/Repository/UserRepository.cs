@@ -16,7 +16,7 @@ namespace NewsWebSite.Models.Repository
             this.sessionFactory = sessionFactory;
         }
 
-        public int Save(User u)
+        public int Save(AppUser u)
         {
             using (var session = sessionFactory.OpenSession())
             {
@@ -28,21 +28,36 @@ namespace NewsWebSite.Models.Repository
                 }
             }
         }
-        public User GetById(int Id)
+        public AppUser GetById(int Id)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                return session.Get<User>(Id);
+                return session.Get<AppUser>(Id);
             }
         }
-        public User FindByName(string name)
+        public AppUser FindByName(string name)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var user = session.CreateCriteria<User>().Add(Restrictions.Eq("UserName", name)).UniqueResult<User>();
+                var user = session.CreateCriteria<AppUser>().Add(Restrictions.Eq("Email", name)).UniqueResult<AppUser>();
                 return user;
                 // return session.Get<User>(Id);
             }
         }
+
+        public bool IsUserWhithUserNameOrEmailExist(string userName, string email)
+        {
+            using (var session = sessionFactory.OpenSession())
+            {
+                var count = session.CreateCriteria(typeof(AppUser))
+                    .Add(Restrictions.Or(Restrictions.Eq("UserName", userName),
+                    Restrictions.Eq("Email", email)))               
+                    .SetProjection(Projections.RowCount())
+                    .UniqueResult<int>();
+                return count == 0;
+            }
+           
+        }
+
     }
 }
