@@ -73,9 +73,8 @@ namespace NewsWebSite.Models.Repository
                     .Add(Projections.Property("Title"), "Title")
                     .Add(Projections.Property("Image"), "Image")
                     .Add(Projections.Property("CreateDate"), "CreateDate")
-                    .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"))
-                    .AddOrder(Order.Desc("Id"))
-                    .SetMaxResults(count);
+                    .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"));
+
                 if (userId > 0)
                 {
                     creteria.Add(Restrictions.Eq("UserId", userId));
@@ -93,6 +92,8 @@ namespace NewsWebSite.Models.Repository
                 var results = new PagedList<DemoArticle>();
 
                 results.AddRange(creteria
+                    .AddOrder(Order.Desc("Id"))
+                    .SetMaxResults(count)
                     .SetResultTransformer(Transformers.AliasToBean<DemoArticle>())
                     .List<DemoArticle>());
 

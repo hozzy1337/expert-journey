@@ -23,8 +23,8 @@ namespace NewsWebSite.Models
             FullDescription = a.FullDescription;
             Image = a.Image;
             Tags = (new TagsHelper()).GetLineToShow(a.Tags);
-            CreateDate = a.CreateDate.ToString("R");
-            UpdateDate = (a.CreateDate != a.LastUpdateDate ? a.LastUpdateDate.ToString("R") : null);
+            CreateDate = a.CreateDate.ToString("dd.MM.yyyy H:mm:ss");
+            UpdateDate = (a.CreateDate != a.LastUpdateDate ? a.LastUpdateDate.ToString("dd.MM.yyyy H:mm:ss") : null);
             Editable = false;
         }
         public ArticleForView() { }

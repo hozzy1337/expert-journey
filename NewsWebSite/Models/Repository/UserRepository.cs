@@ -39,7 +39,7 @@ namespace NewsWebSite.Models.Repository
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var user = session.CreateCriteria<AppUser>().Add(Restrictions.Eq("Email", name)).UniqueResult<AppUser>();
+                var user = session.CreateCriteria<AppUser>().Add(Restrictions.Eq("UserName", name)).UniqueResult<AppUser>();
                 return user;
                 // return session.Get<User>(Id);
             }

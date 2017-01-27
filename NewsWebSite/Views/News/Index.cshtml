@@ -12,16 +12,15 @@
             <label>Только мои новости</label>
             if (Model.OnlyMyArticles)
             {
-            <input type="checkbox" name="onlyMyArt" value="true" checked="checked" />
+                <input type="checkbox" name="onlyMyArt" value="true" checked="checked" />
             }
             else
             {
                 <input type="checkbox" name="onlyMyArt" value="true" />
             }
-            <input type="hidden" name="onlyMyArt" value="false"/>
+            <input type="hidden" name="onlyMyArt" value="false" />
         }
-
-        <input type="text" name="tags" value="@Model.TagListToSHow" placeholder="Теги"/>
+        <input type="text" name="tags" value="@Model.TagListToSHow" placeholder="Теги" />
         <input type="submit" value="Показать" />
     }
 </div>
@@ -31,7 +30,7 @@
     {
         <div class="news-item" id="@a.Id">
             <div class="news-img"><img src="@Url.Content("~/Content/UserImages/")@a.Id/@a.Image" alt="IMG"></div>
-            <p class="upload-time">@a.LastUpdateDate</p>
+            <p class="upload-time">@a.LastUpdateDate.ToString("yyyy-MM-dd H:mm:ss")</p>
             <h3><a id="Title-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">@a.Title</a></h3>
             <a id="More-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">ПОДРОБНЕЕ</a>
         </div>
@@ -40,7 +39,7 @@
 
 @section scripts {
     <script type="text/javascript">
-        var onlyMyArt = "@Model.OnlyMyArticles";
+        var onlyMyArt = Boolean(@Model.OnlyMyArticles.ToString().ToLower());
         var id = 0;
         var LastId = @(Model.ArticleList.Count > 0 ? Model.ArticleList [Model.ArticleList.Count - 1].Id : 0);
         var tagLine = "@Model.TagList";
@@ -52,7 +51,7 @@
         function RequestArticles() {
             $.ajax({
                 url: '/News/GetArticles',
-                timeout: 3000,
+  //              timeout: 3000,
                 method: 'POST',
                 dataType: 'Json',
                 async: true,
@@ -83,7 +82,7 @@
         {
             $.ajax({
                 url: '/News/GetArticles',
-                timeout: 3000,
+      //          timeout: 3000,
                 method: 'POST',
                 dataType: 'Json',
                 async: true,
@@ -106,7 +105,7 @@
                 inProgress = false;
                 if (id > 0)
                 {
-                                     ScrollTo(id);
+                    ScrollTo(id);
                 }
             });
         }
@@ -155,8 +154,8 @@
         <div class="news-item">
             <div class="news-img"><img src="@Url.Content("~/Content/UserImages")/[Id]/[Image]" class="images" alt="IMG"></div>
             <p class="upload-time">[Date]</p>
-            <h3><a id="Title-[Id]" href="@Url.Action("Acricle")?Id=[Id]" onclick="Redirect([Id])">[Title]</a></h3>
-            <a id="More-[Id]" href="@Url.Action("Article")?Id=[Id]" onclick="Redirect([Id])">ПОДРОБНЕЕ</a>
+            <h3><a id="Title-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">[Title]</a></h3>
+            <a id="More-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">ПОДРОБНЕЕ</a>
         </div>
     </script>
 }
