@@ -45,7 +45,7 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li><a href="@Url.Action("CreateArticle", "News")">создать новость</a></li>
-                        <li><a href="@Url.Action("LogOff", "Account")">выйти (@User.Identity.Name)</a></li>
+                        <li><a href="@Url.Action("LogOff", "Account")">выйти (@User.Identity.Name.Split('@')[0])</a></li>
                     }
                     else
                     {

@@ -18,8 +18,8 @@ namespace NewsWebSite.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-     //   private SignInManager<User, int> _signInManager;
-      //  private UserManager<User, int> _userManager;
+        //   private SignInManager<User, int> _signInManager;
+        //  private UserManager<User, int> _userManager;
 
         public AccountController()
         {
@@ -58,7 +58,7 @@ namespace NewsWebSite.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-          //  var user = new AppUser { UserName = model.Email, Email = model.Email, Password = model.Password };
+            //  var user = new AppUser { UserName = model.Email, Email = model.Email, Password = model.Password };
             var result = //SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
@@ -136,12 +136,12 @@ namespace NewsWebSite.Controllers
         {
             if (ModelState.IsValid)
             {
-            //    if (!repo.IsUserWhithUserNameOrEmailExist(model.UserName, model.Email))
-            //    {
-            //        ModelState.AddModelError("UserName", "Email And Username must be uniq");
-            //        return View(model);
-            //    }
-                    var user = new AppUser { UserName = model.UserName, Email = model.Email };
+                //    if (!repo.IsUserWhithUserNameOrEmailExist(model.UserName, model.Email))
+                //    {
+                //        ModelState.AddModelError("UserName", "Email And Username must be uniq");
+                //        return View(model);
+                //    }
+                var user = new AppUser { UserName = model.Email };//, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -357,7 +357,7 @@ namespace NewsWebSite.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new AppUser { UserName = model.Email, Email = model.Email };
+                var user = new AppUser { UserName = model.Email };//, Email = model.Email };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -377,7 +377,7 @@ namespace NewsWebSite.Controllers
 
         //
         // GET: /Account/LogOff
- 
+
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);

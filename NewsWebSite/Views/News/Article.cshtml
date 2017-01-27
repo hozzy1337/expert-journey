@@ -4,23 +4,19 @@
     Layout = "~/Views/Shared/Lay.cshtml";
 }
 
-
 <article class="news-view">
     <div class="news-img">
         <img src="@Url.Content("~/Content/UserImages/"+ Model.Id + "/" + Model.Image)" alt="SRC">
         <span class="upload-date">
+            Created: @Model.CreateDate
             @if (Model.UpdateDate != null)
             {
-                @Model.UpdateDate
-            }
-            else
-            {
-                @Model.CreateDate
+                @Html.Raw("<br/>Updated: ") @Model.UpdateDate
             }
         </span>
         @if (Model.Editable)
-        {
-        <a class="edit" href="@Url.Action("EditArticle", new { Id = Model.Id })">РЕДАКТИРОВАТЬ</a>
+            {
+            <a class="edit" href="@Url.Action("EditArticle", new { Id = Model.Id })">РЕДАКТИРОВАТЬ</a>
         }
         <div class="hide"></div>
     </div>

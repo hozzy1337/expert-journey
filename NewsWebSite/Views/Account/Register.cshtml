@@ -11,8 +11,8 @@
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary("", new { @class = "text-danger" })
-        @Html.LabelFor(m => m.UserName, new { @class = "label-text" })
-        @Html.TextBoxFor(m => m.UserName)
+        //@Html.LabelFor(m => m.UserName, new { @class = "label-text" })
+        //@Html.TextBoxFor(m => m.UserName)
         @Html.LabelFor(m => m.Email, new { @class = "label-text" })
         @Html.TextBoxFor(m => m.Email)
         @Html.LabelFor(m => m.Password, new { @class = "label-text" })

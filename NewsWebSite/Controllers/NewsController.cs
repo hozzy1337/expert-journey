@@ -29,6 +29,7 @@ namespace NewsWebSite.Controllers
             this.repo = repo;
         }
 
+        
 
 
         #region ForDebug
@@ -43,6 +44,7 @@ namespace NewsWebSite.Controllers
                 a.Title = i.ToString();
                 a.FullDescription = a.Title;
                 a.Tags = ",tag,tag1,";
+                a.UserId = 11;
                 repo.Save(a);
 
             }
@@ -163,11 +165,11 @@ namespace NewsWebSite.Controllers
         #region ForAjaxRequests
 
         [HttpPost]
-        public string GetArticles(int page = 1, int n = 1, int lastId = 0, string onlyMyArticles = "False", string tagLine = "")
+        public string GetArticles(int page = 1, int n = 1, int lastId = 0, bool onlyMyArticles = false, string tagLine = "")
         {
             if (page < 1) return ""; 
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine),
-                (onlyMyArticles == "True" && User.Identity.IsAuthenticated ? User.Identity.GetUserId<int>() : 0));// as IList<DemoArticle>;
+                (onlyMyArticles && User.Identity.IsAuthenticated ? User.Identity.GetUserId<int>() : 0));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
         }
 
