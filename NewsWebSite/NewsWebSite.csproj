@@ -45,6 +45,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AntiXssLibrary, Version=4.3.0.0, Culture=neutral, PublicKeyToken=d127efab8a9c114f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AntiXSS.4.3.0\lib\net40\AntiXssLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlSanitizationLibrary, Version=4.3.0.0, Culture=neutral, PublicKeyToken=d127efab8a9c114f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AntiXSS.4.3.0\lib\net40\HtmlSanitizationLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
@@ -225,7 +233,7 @@
     <Compile Include="Attributes\ValidImage.cs" />
     <Compile Include="Attributes\AllowedExtensions.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="FIleHelper.cs" />
     <Compile Include="Global.asax.cs">
@@ -233,17 +241,25 @@
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Article.cs" />
-    <Compile Include="Models\ArticleForView.cs" />
+    <Compile Include="Views\ArticleForView.cs" />
+    <Compile Include="Models\CustomUserStore.cs" />
     <Compile Include="Models\DemoArticle.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Repository\IUserRepository.cs" />
     <Compile Include="Models\Repository\NHibernateRepository.cs" />
     <Compile Include="Models\Repository\IRepository.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Repository\UserRepository.cs" />
+    <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\ViewModel\CreateArticleModel.cs" />
     <Compile Include="Models\ViewModel\EditArticleModel.cs" />
+    <Compile Include="Models\ViewModel\IndexViewModel.cs" />
     <Compile Include="Models\ViewModel\ListItemPageModel.cs" />
+    <Compile Include="Models\ViewModel\LoginViewModel.cs" />
+    <Compile Include="Models\ViewModel\RegisterViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="TagsHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.min.css" />
@@ -251,11 +267,13 @@
     <Content Include="Content\Images\search_img.png" />
     <Content Include="Content\Images\tiDNCMp.png" />
     <Content Include="Content\main_adaptive.css" />
+    <Content Include="Content\Style.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <EmbeddedResource Include="Models\NHibernate\Article.hbm.xml" />
+    <EmbeddedResource Include="Models\NHibernate\AppUser.hbm.xml" />
     <Content Include="Scripts\ai.0.22.19-build00125.js" />
     <Content Include="Scripts\ai.0.22.19-build00125.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -296,9 +314,9 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\News\About.cshtml" />
+    <Content Include="Views\News\Contact.cshtml" />
+    <Content Include="Views\News\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
@@ -319,15 +337,17 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Home\CreateArticle.cshtml" />
-    <Content Include="Views\Home\Article.cshtml" />
+    <Content Include="Views\News\CreateArticle.cshtml" />
+    <Content Include="Views\News\Article.cshtml" />
     <Content Include="Views\Shared\Lay.cshtml" />
-    <Content Include="Views\Shared\View.cshtml" />
-    <Content Include="Views\Home\EditArticle.cshtml" />
+    <Content Include="Views\News\EditArticle.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\ImageUpload.cshtml" />
+    <Content Include="Views\News\Registration.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\UserImages\" />
+    <Folder Include="Views\Profile\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

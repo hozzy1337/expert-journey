@@ -1,0 +1,28 @@
+﻿@using NewsWebSite.Models;
+@model ArticleForView
+@{
+    Layout = "~/Views/Shared/Lay.cshtml";
+}
+
+<article class="news-view">
+    <div class="news-img">
+        <img src="@Url.Content("~/Content/UserImages/"+ Model.Id + "/" + Model.Image)" alt="SRC">
+        <span class="upload-date">
+            Created: @Model.CreateDate
+            @if (Model.UpdateDate != null)
+            {
+                @Html.Raw("<br/>Updated: ") @Model.UpdateDate
+            }
+        </span>
+        @if (Model.Editable)
+            {
+            <a class="edit" href="@Url.Action("EditArticle", new { Id = Model.Id })">РЕДАКТИРОВАТЬ</a>
+        }
+        <div class="hide"></div>
+    </div>
+    <header><h3>@Model.Title</h3></header>
+    <p class="news-description">
+        @Model.FullDescription
+    </p>
+    <p class="news-description">Tags: @Model.Tags</p>
+</article>

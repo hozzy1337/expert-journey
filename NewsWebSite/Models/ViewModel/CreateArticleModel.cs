@@ -4,23 +4,31 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using Microsoft.Security.Application;
 
 namespace NewsWebSite.Models.ViewModel
 {
     public class CreateArticleModel
     {
-
-        //public int Id { get; set; }
+        private string title;
         [Required]
         [Display(Name = "Заголовок")]
         [StringLength(50, ErrorMessage = "Description Max Length is 50")]
-        public string Title { get; set; }
+        public string Title { get { return title;} set { title = Sanitizer.GetSafeHtmlFragment(value); } }
 
+        private string fulldescription;
         [Required]
         [Display(Name = "Текст статьи")]
         [DataType(DataType.MultilineText)]
-        [StringLength(5000, ErrorMessage = "Description Max Length is 5000")]
-        public string FullDescription { get; set; }
+        [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
+        public string FullDescription { get { return fulldescription; } set { fulldescription = Sanitizer.GetSafeHtmlFragment(value); } }
+
+        
+        private string tags;
+        [Required]
+        [Display(Name = "Теги статьи")]
+        [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
+        public string Tags { get { return tags; } set { tags = Sanitizer.GetSafeHtmlFragment(value); } }
 
         [Required]
         [Display(Name = "Изображение")]

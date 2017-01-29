@@ -1,0 +1,161 @@
+﻿@using NewsWebSite.Models.ViewModel
+@model ListItemPageModel
+@{
+    Layout = "~/Views/Shared/Lay.cshtml";
+}
+<div>
+    @using (Html.BeginForm("Index", "News", FormMethod.Post))
+    {
+        @Html.ValidationSummary()
+        if (User.Identity.IsAuthenticated)
+        {
+            <label>Только мои новости</label>
+            if (Model.OnlyMyArticles)
+            {
+                <input type="checkbox" name="onlyMyArt" value="true" checked="checked" />
+            }
+            else
+            {
+                <input type="checkbox" name="onlyMyArt" value="true" />
+            }
+            <input type="hidden" name="onlyMyArt" value="false" />
+        }
+        <input type="text" name="tags" value="@Model.TagListToSHow" placeholder="Теги" />
+        <input type="submit" value="Показать" />
+    }
+</div>
+
+<div id="news_panel">
+    @foreach (var a in Model.ArticleList)
+    {
+        <div class="news-item" id="@a.Id">
+            <div class="news-img"><img src="@Url.Content("~/Content/UserImages/")@a.Id/@a.Image" alt="IMG"></div>
+            <p class="upload-time">@a.LastUpdateDate.ToString("yyyy-MM-dd H:mm:ss")</p>
+            <h3><a id="Title-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">@a.Title</a></h3>
+            <a id="More-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">ПОДРОБНЕЕ</a>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        var onlyMyArt = Boolean(@Model.OnlyMyArticles.ToString().ToLower());
+        var id = 0;
+        var LastId = @(Model.ArticleList.Count > 0 ? Model.ArticleList [Model.ArticleList.Count - 1].Id : 0);
+        var tagLine = "@Model.TagList";
+        var loadingComplete = false;
+        var inProgress = false;
+        var startFrom = 1;
+
+
+        function RequestArticles() {
+            $.ajax({
+                url: '/News/GetArticles',
+  //              timeout: 3000,
+                method: 'POST',
+                dataType: 'Json',
+                async: true,
+                data: { "Page": startFrom, "lastId": LastId, "onlyMyArticles": onlyMyArt, "tagLine": tagLine },
+                beforeSend: function() {
+                    inProgress = true;
+                }
+            }).done(function(data) {
+                var firstid = 0;
+                if (data.length > 0)
+                {
+                    firstid = data[0].Id;
+                    $.each(data, function(index, data) {
+                        var templ = ($("#template").html().split("[Id]").join(data.Id));
+                        templ = templ.split("[Image]").join(data.Image);
+                        templ = templ.split("[Title]").join(data.Title);
+                        templ = templ.split("[Date]").join(data.CreateDate.replace("T", " "));
+                        $('#news_panel').append(templ);
+                    });
+                    LastId = data[data.length - 1].Id;
+                }
+                startFrom++;
+                location.hash = startFrom - 1 + ':' + firstid;
+                inProgress = false;
+            });
+        }
+        function GetNPagesOfArticles(page)
+        {
+            $.ajax({
+                url: '/News/GetArticles',
+      //          timeout: 3000,
+                method: 'POST',
+                dataType: 'Json',
+                async: true,
+                data: { "n": startFrom + 1, "lastId": LastId, "onlyMyArticles": onlyMyArt, "tagLine": tagLine },
+                beforeSend: function() {
+                    inProgress = true;
+                }
+            }).done(function(data) {
+                if (data.length > 0)
+                {
+                    $.each(data, function(index, data) {
+                        var templ = ($("#template").html().split("[Id]").join(data.Id));
+                        templ = templ.split("[Image]").join(data.Image);
+                        templ = templ.split("[Title]").join(data.Title);
+                        templ = templ.split("[Date]").join(data.CreateDate.replace("T", " "));
+                        $('#news_panel').append(templ);
+                    });
+                }
+                startFrom = page + 1;
+                inProgress = false;
+                if (id > 0)
+                {
+                    ScrollTo(id);
+                }
+            });
+        }
+        $(document).ready(function ()
+        {
+            $(window).scroll(function()
+            {
+                if (loadingComplete)
+                    if (startFrom < @Model.ArticleList.PageCount && !inProgress && $(window).scrollTop() >= $(document).height() - $(window).height() - 250)
+                    {
+                        RequestArticles();
+                    }
+            });
+
+            var page = 0;
+            if (location.hash.length > 0)
+            {
+                var string = location.hash.replace('#', '');
+                var arr = string.split(':');
+                page = arr[0];
+                id = arr[1];
+
+            }
+            if (id > 0 && page > 0)
+            {
+                GetNPagesOfArticles(page - 1);
+            }
+            loadingComplete = true;
+            if (startFrom < @Model.ArticleList.LinesCount && !inProgress && $(window).height() >= $(document).height())
+            {
+                RequestArticles(true);
+            }
+        });
+        function ScrollTo(ide)
+        {
+            var destination = $(ide).offset().top;
+            $('body').animate({ scrollTop: destination }, 1000);
+        }
+        function Redirect(id)
+        {
+            location.hash = startFrom + ':' + id;
+        }
+    </script>
+
+    <script type="text/template" id="template">
+        <div class="news-item">
+            <div class="news-img"><img src="@Url.Content("~/Content/UserImages")/[Id]/[Image]" class="images" alt="IMG"></div>
+            <p class="upload-time">[Date]</p>
+            <h3><a id="Title-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">[Title]</a></h3>
+            <a id="More-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">ПОДРОБНЕЕ</a>
+        </div>
+    </script>
+}

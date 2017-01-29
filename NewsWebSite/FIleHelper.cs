@@ -7,8 +7,9 @@ using System.Web.Mvc;
 
 namespace NewsWebSite
 {
-    public class FIleHelper
+    public class FileHelper
     {
+        //todo: read abouint c# Strea0m
         public bool SaveOrUpdateArticleImage(string folderPath, HttpPostedFileBase image, int id)
         {
             var isChanged = true;
