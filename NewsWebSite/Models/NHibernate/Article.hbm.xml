@@ -6,7 +6,7 @@
       <generator class="native" />
     </id>
     <property name="Title" />
-    <property name="FullDescription" type="string"/>
+    <property name="FullDescription" type="string" length="1000000"/>
     <property name="Image" />
     <property name="CreateDate" />
     <property name="LastUpdateDate" />

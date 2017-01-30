@@ -23,14 +23,17 @@ namespace NewsWebSite.Controllers
 
         readonly TagsHelper th = new TagsHelper();
         readonly IRepository repo;
-
+        public string dcp()
+        {
+            return ((int)'м').ToString();
+        }
 
         public NewsController(IRepository repo)
         {
             this.repo = repo;
         }
 
-        
+
 
 
         #region ForDebug
@@ -58,7 +61,7 @@ namespace NewsWebSite.Controllers
         public ActionResult Index(bool onlyMyArt = false, string tags = "")
         {
             int userId = 0;
-           
+
             if (onlyMyArt && User.Identity.IsAuthenticated)
             {
                 userId = User.Identity.GetUserId<int>();
@@ -113,10 +116,9 @@ namespace NewsWebSite.Controllers
                 {
                     return RedirectToAction("Article", new { Id = id });
                 }
-
+                else ModelState.AddModelError("length", "Поля содержат недопустимые значения!");
             }
             return View(a);
-
         }
 
 
@@ -177,7 +179,7 @@ namespace NewsWebSite.Controllers
         [HttpPost]
         public string GetArticles(int page = 1, int n = 1, int lastId = 0, bool onlyMyArticles = false, string tagLine = "")
         {
-            if (page < 1) return ""; 
+            if (page < 1) return "";
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine),
                 (onlyMyArticles && User.Identity.IsAuthenticated ? User.Identity.GetUserId<int>() : 0));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);

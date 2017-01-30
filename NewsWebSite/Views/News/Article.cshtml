@@ -22,7 +22,7 @@
     </div>
     <header><h3>@Model.Title</h3></header>
     <p class="news-description">
-        @Model.FullDescription
-    </p>
+        @Html.Raw(Model.FullDescription)
+     </p>
     <p class="news-description">Tags: @Model.Tags</p>
 </article>
