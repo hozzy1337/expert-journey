@@ -13,6 +13,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
 using Microsoft.AspNet.Identity;
+using NewsWebSite.Models.Repository;
 
 namespace NewsWebSite.Controllers
 {
@@ -21,10 +22,10 @@ namespace NewsWebSite.Controllers
         readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
 
         readonly TagsHelper th = new TagsHelper();
-        readonly IRepository repo;
+        readonly IArticleRepository repo;
 
 
-        public NewsController(IRepository repo)
+        public NewsController(IArticleRepository repo)
         {
             this.repo = repo;
         }
@@ -69,7 +70,7 @@ namespace NewsWebSite.Controllers
                 tagline = th.GetLine(tags);
 
             }
-            var list = repo.GetDemoList(0, NumberOfItemsOnPage, 0, th.GetArray(tagline), userId);
+            var list = repo.GetDemoList(0, NumberOfItemsOnPage, 0, th.GetArray(tagline));
             var model = new ListItemPageModel(NumberOfItemsOnPage, list, onlyMyArt, tagline, th.GetLineToShow(tagline));
             return View(model);
         }
@@ -168,8 +169,7 @@ namespace NewsWebSite.Controllers
         public string GetArticles(int page = 1, int n = 1, int lastId = 0, bool onlyMyArticles = false, string tagLine = "")
         {
             if (page < 1) return ""; 
-            var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine),
-                (onlyMyArticles && User.Identity.IsAuthenticated ? User.Identity.GetUserId<int>() : 0));// as IList<DemoArticle>;
+            var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
         }
 
