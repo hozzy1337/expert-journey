@@ -69,8 +69,9 @@ namespace NewsWebSite.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<IRepository>().To<NHibernateRepository>();
+            kernel.Bind<IArticleRepository>().To<ArticleRepository>();
             kernel.Bind<IUserRepository>().To<UserRepository>();
+            kernel.Bind<ICommentsRepository>().To<CommentsRepository>();
             kernel.Bind<UserManager<AppUser, int>>().To<UserManager<AppUser, int>>();
             kernel.Bind<SignInManager<AppUser, int>>().To<SignInManager<AppUser, int>>();
             kernel.Bind<IUserStore<AppUser, int>>().To<CustomUserStore>();

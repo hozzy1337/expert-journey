@@ -39,25 +39,15 @@ namespace NewsWebSite.Models.Repository
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var user = session.CreateCriteria<AppUser>().Add(Restrictions.Eq("UserName", name)).UniqueResult<AppUser>();
+                var user = session.CreateCriteria<AppUser>()
+                    .Add(Restrictions.Eq("UserName", name))
+                    .UniqueResult<AppUser>();
                 return user;
-                // return session.Get<User>(Id);
+
             }
         }
 
-        public bool IsUserWhithUserNameOrEmailExist(string userName, string email)
-        {
-            using (var session = sessionFactory.OpenSession())
-            {
-                var count = session.CreateCriteria(typeof(AppUser))
-                    .Add(Restrictions.Or(Restrictions.Eq("UserName", userName),
-                    Restrictions.Eq("Email", email)))               
-                    .SetProjection(Projections.RowCount())
-                    .UniqueResult<int>();
-                return count == 0;
-            }
-           
-        }
+       
 
     }
 }

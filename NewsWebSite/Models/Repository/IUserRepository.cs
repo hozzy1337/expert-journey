@@ -10,8 +10,7 @@ namespace NewsWebSite.Models.Repository
         int Save(AppUser u);
         AppUser GetById(int id);
         AppUser FindByName(string name);
-        bool IsUserWhithUserNameOrEmailExist(string userName, string email);
-
+   
 
     }
 }

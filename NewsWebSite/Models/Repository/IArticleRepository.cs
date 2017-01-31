@@ -10,13 +10,13 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 
-namespace NewsWebSite.Models
+namespace NewsWebSite.Models.Repository
 {
-    public interface IRepository
+    public interface IArticleRepository
     {
         Article GetItem(int id);
         int GetCountOfLines();
-        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] tagList, int userId);
+        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] tagList);
         int Save(Article article);
     }
 
