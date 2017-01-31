@@ -11,8 +11,8 @@
         <div class="news-item" id="@a.Id">
             <div class="news-img"><img src="@Url.Content("~/Content/UserImages/")@a.Id/@a.Image" alt="IMG"></div>
             <p class="upload-time">@a.LastUpdateDate.ToString("yyyy-MM-dd H:mm:ss")</p>
-            <h3><a id="Title-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">@a.Title</a></h3>
-            <a id="More-@a.Id" href="@Url.Action("Article", new { Id = a.Id })" onclick="Redirect(@a.Id);">ПОДРОБНЕЕ</a>
+            <h3><a id="Title-@a.Id" href="@Url.Action("Article", new { Id = a.Id })">@a.Title</a></h3>
+            <a id="More-@a.Id" href="@Url.Action("Article", new { Id = a.Id })">ПОДРОБНЕЕ</a>
         </div>
     }
 </div>
@@ -24,7 +24,8 @@
         var startFrom = 1;
 
 
-        function RequestArticles() {
+        function RequestArticles() 
+        {
             $.ajax({
                 url: '/News/GetArticles',
   //              timeout: 3000,
@@ -72,8 +73,8 @@
         <div class="news-item">
             <div class="news-img"><img src="@Url.Content("~/Content/UserImages")/[Id]/[Image]" class="images" alt="IMG"></div>
             <p class="upload-time">[Date]</p>
-            <h3><a id="Title-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">[Title]</a></h3>
-            <a id="More-[Id]" href="@Url.Action("Article")/[Id]" onclick="Redirect([Id])">ПОДРОБНЕЕ</a>
+            <h3><a id="Title-[Id]" href="@Url.Action("Article")/[Id]">[Title]</a></h3>
+            <a id="More-[Id]" href="@Url.Action("Article")/[Id]">ПОДРОБНЕЕ</a>
         </div>
     </script>
 }

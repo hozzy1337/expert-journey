@@ -7,10 +7,11 @@ namespace NewsWebSite.Models
 {
     public class Comment
     {
-        public int Id { get; set; }
-        public string Text { get; set; }
-        public int ArticleId { get; set; }
-        public int Depth { get; set; }
-        public int BaseCommentId { get; set; }
+        public virtual int Id { get; set; }
+        public virtual string UserName { get; set; }
+        public virtual string Text { get; set; }
+        public virtual int ArticleId { get; set; }
+        public virtual int Depth { get; set; }
+        public virtual int BaseCommentId { get; set; }
     }
 }

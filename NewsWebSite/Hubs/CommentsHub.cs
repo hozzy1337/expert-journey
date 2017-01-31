@@ -23,34 +23,34 @@ namespace NewsWebSite.Hubs
             this.commentsRepository = commentsRepository;
         }
 
-       // static readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
+        // static readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
         //static readonly List<CommentsUser> Users = new List<CommentsUser>();
 
         // Отправка сообщений
         [Authorize]
         public void Send(int articleId = 0, int replyCommentId = 0, string text = "")
         {
-
             text = Sanitizer.GetSafeHtmlFragment(text);
             if (text.Length <= 0 || text.Length > 100)
                 Clients.Caller.InvalidTextLength();
             else
             if (replyCommentId < 0) return;
-            Comment comment = new Comment();
+
+            var commentDepth = 0;
             if (replyCommentId > 0)
             {
                 var baseComment = commentsRepository.GetCommentInfo(replyCommentId);
-                if (baseComment != null)
-                {
-                    if (articleId != baseComment.ArticleId) return;
-                    comment.ArticleId = articleId;
-                    comment.Depth = ++baseComment.Depth;
-                    comment.Text = text;
-
-                    Clients.Group(articleId.ToString()).addMessage();
-                }    
+                if (baseComment == null) return;
+                commentDepth = baseComment.Depth + 1;
             }
-                
+            else if (!articleRepository.IsExist(articleId)) return;
+            Comment comment = new Comment();
+            comment.ArticleId = articleId;
+            comment.Text = text;
+            comment.UserName = Context.User.Identity.Name.Split('@')[0];
+            comment.Depth = commentDepth;
+            commentsRepository.Save(comment);
+            Clients.Group(articleId.ToString()).addMessage();
         }
 
         // Подключение нового пользователя
@@ -74,28 +74,7 @@ namespace NewsWebSite.Hubs
             //}
         }
 
-        // Отключение пользователя
-        public override Task OnDisconnected(bool stopCalled)
-        {
-            // var item = Users.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-            //  if (item != null)
-            // {
-            //locker.EnterWriteLock();
-            //try
-            //{
-            //    Users.Remove(item);
-            //}
-            //finally
-            //{
-            //    locker.ExitWriteLock();
-            //}
-            Groups.Remove(Context.ConnectionId, "");
-                var id = Context.ConnectionId;
-                //Clients.All.onUserDisconnected(id, item.Name);
-    //        }
 
-            return base.OnDisconnected(stopCalled);
-        }
     }
 
 
