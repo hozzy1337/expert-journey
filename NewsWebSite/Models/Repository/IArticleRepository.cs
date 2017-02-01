@@ -16,7 +16,7 @@ namespace NewsWebSite.Models.Repository
     {
         Article GetItem(int id);
         int GetCountOfLines();
-        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] tagList);
+        PagedList<DemoArticle> GetDemoList(int starFrom, int count, int lastId, string[] taglist/*, int userId*/);
         int Save(Article article);
         bool IsExist(int id);
     }

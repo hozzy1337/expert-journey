@@ -10,6 +10,7 @@ namespace NewsWebSite
         {
             ConfigureAuth(app);
             app.MapSignalR();
+
         }
     }
 }

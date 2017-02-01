@@ -9,7 +9,7 @@
     <property name="Text" />
     <property name="ArticleId" />
     <property name="Depth" />
-    <property name="BaseCommentId" />
+    <property name="ReplyCommentId" />
     <property name="Created" />
   </class>
 </hibernate-mapping>

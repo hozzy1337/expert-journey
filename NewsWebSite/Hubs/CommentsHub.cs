@@ -32,17 +32,15 @@ namespace NewsWebSite.Hubs
         public void Send(int articleId = 0, int replyCommentId = 0, string text = "")
         {
             text = Sanitizer.GetSafeHtmlFragment(text);
-            if (text.Length <= 0 || text.Length > 100)
-                Clients.Caller.InvalidTextLength();
-            else
+            if (text.Length <= 0 || text.Length > 250) return;
             if (replyCommentId < 0) return;
-
             var commentDepth = 0;
-            if (replyCommentId > 0)
+            if (replyCommentId != 0)
             {
                 var baseComment = commentsRepository.GetCommentInfo(replyCommentId);
                 if (baseComment == null) return;
                 commentDepth = baseComment.Depth + 1;
+                
             }
             else if (!articleRepository.IsExist(articleId)) return;
             Comment comment = new Comment();
@@ -51,8 +49,9 @@ namespace NewsWebSite.Hubs
             comment.UserName = Context.User.Identity.Name.Split('@')[0];
             comment.Depth = commentDepth;
             comment.Created = DateTime.Now;
-            commentsRepository.Save(comment);
-            Clients.Group(articleId.ToString()).addMessage(comment.UserName, text, comment.Created, 0, 0);
+            comment.ReplyCommentId = replyCommentId;
+            var id = commentsRepository.Save(comment);
+            Clients.Group(articleId.ToString()).addMessage(id, comment.UserName, comment.Text, comment.Created.ToString("yyyy-MM-dd HH:mm:ss"), replyCommentId);
         }
 
         // Подключение нового пользователя
@@ -60,20 +59,6 @@ namespace NewsWebSite.Hubs
         {
             var id = Context.ConnectionId;
             Groups.Add(id, articleId.ToString());
-            //var user = Context.User;
-            //if (!user.Identity.IsAuthenticated) return;
-            //if (!Users.Any(u => u.ConnectionId == id))
-            //{
-            //    locker.EnterWriteLock();
-            //    try
-            //    {
-            //        Users.Add(new CommentsUser { ConnectionId = id, UserName = user.Identity.Name, AppUserId = user.Identity.GetUserId<int>(), ArticleId = articleId });
-            //    }
-            //    finally
-            //    {
-            //        locker.ExitWriteLock();
-            //    }
-            //}
         }
 
 

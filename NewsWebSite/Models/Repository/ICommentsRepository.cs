@@ -11,12 +11,12 @@ namespace NewsWebSite.Models.Repository
     {
         Comment GetItem(int id);
         int Save(Comment comment);
-        bool IsExist(int id);
+        //bool IsExist(int id);
         int GetArticleId(int id);
-        int GetBaseCommentId(int id);
-        int GetBaseCommentDepth(int id);
+        int GetReplyCommentId(int id);
+      //  int GetBaseCommentDepth(int id);
         void Delete(int id);
-        PagedList<Comment> GetList(int articleId);
+        IList<Comment> GetList(int articleId);
         CommentInfo GetCommentInfo(int id);
     }
 }

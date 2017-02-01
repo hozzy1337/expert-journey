@@ -30,7 +30,6 @@ namespace NewsWebSite.Models.ViewModel
         [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
         public string Tags { get; set; }
 
-        [Required]
         [Display(Name = "Изображение")]
         [ValidImage(maxSizeMB = 5)]
         [AllowedExtensions(new string[] { ".jpg", ".png" })]

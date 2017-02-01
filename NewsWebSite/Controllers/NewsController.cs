@@ -23,11 +23,13 @@ namespace NewsWebSite.Controllers
 
         readonly TagsHelper th = new TagsHelper();
         readonly IArticleRepository repo;
+        readonly ICommentsRepository commentsRepository;
 
 
-        public NewsController(IArticleRepository repo)
+        public NewsController(IArticleRepository repo, ICommentsRepository commentsRepository)
         {
             this.repo = repo;
+            this.commentsRepository = commentsRepository;
         }
 
 
@@ -130,18 +132,27 @@ namespace NewsWebSite.Controllers
         {
             if (!ModelState.IsValid) return View(edited);
             var baseArticle = repo.GetItem(edited.Id);
-
+            var changed = false;
             if (baseArticle == null || baseArticle.UserId != User.Identity.GetUserId<int>()) return HttpNotFound();
 
 
             var fileHelper = new FileHelper();
-            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id);
+            if (edited.Image != null &&
+            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id))
+                changed = true;
 
+            if (baseArticle.Title != edited.Title)
+            {
+                baseArticle.Title = edited.Title;
+                changed = true;
+            }
 
-            baseArticle.Title = edited.Title;
+            if (baseArticle.FullDescription != edited.FullDescription)
+            {
+                baseArticle.FullDescription = edited.FullDescription;
+                changed = true;
+            }
 
-
-            baseArticle.FullDescription = edited.FullDescription;
 
             baseArticle.Tags = th.GetLine(edited.Tags);
 
@@ -158,6 +169,13 @@ namespace NewsWebSite.Controllers
             if (page < 1) return "";
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
+        }
+
+        [HttpPost]
+        public string GetComments(int articleId)
+        {
+            var list = commentsRepository.GetList(articleId);
+            return JsonConvert.SerializeObject(list);
         }
 
         #endregion

@@ -18,6 +18,8 @@ namespace NewsWebSite.App_Start
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.Owin;
     using Microsoft.Owin.Security;
+    using Microsoft.AspNet.SignalR;
+    using NinjectDependencyResolvers;
 
     public static class NinjectWebCommon
     {
@@ -53,6 +55,8 @@ namespace NewsWebSite.App_Start
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
                 kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
 
+                
+
                 RegisterServices(kernel);
                 return kernel;
             }
@@ -76,9 +80,8 @@ namespace NewsWebSite.App_Start
             kernel.Bind<SignInManager<AppUser, int>>().To<SignInManager<AppUser, int>>();
             kernel.Bind<IUserStore<AppUser, int>>().To<CustomUserStore>();
             kernel.Bind<IAuthenticationManager>().ToMethod(_ => HttpContext.Current.GetOwinContext().Authentication);
-            
 
-                kernel.Bind<ISessionFactory>().ToMethod(context =>
+            kernel.Bind<ISessionFactory>().ToMethod(context =>
             {
                 var configuration = new Configuration();
 
@@ -92,6 +95,8 @@ namespace NewsWebSite.App_Start
 
                 return sessionFactory;
             }).InSingletonScope();
+
+            GlobalHost.DependencyResolver = new SignalRNinjectDependencyResolver(kernel);
         }
     }
 }

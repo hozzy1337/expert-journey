@@ -18,6 +18,8 @@ namespace NewsWebSite.Models
         public virtual int UserId { get; set; }
         public virtual string Tags { get; set; }
 
+
+        public Article() { }
         public Article(string title, string fulldescription, string image, string tags, int userId)
         {
             Title = title;
@@ -26,5 +28,6 @@ namespace NewsWebSite.Models
             Tags = tags;
             UserId = userId;
         }
+        
     }
 }

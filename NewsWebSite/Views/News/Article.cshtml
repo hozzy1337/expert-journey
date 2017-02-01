@@ -25,4 +25,175 @@
         @Model.FullDescription
     </p>
     <p class="news-description">Tags: @Model.Tags</p>
+
 </article>
+<div class="commentsBlock">
+    <div id="comments" class="comments">
+        <div id="loader" class="hidden"></div>
+        
+    </div>
+    <div class="sendBlock hidden" id="sendBlock">
+        <textarea name="message" id="message"></textarea>
+        <input type="button" value="Send" id="send" />
+    </div>
+</div>
+@section scripts {
+
+    @Scripts.Render("~/Scripts/jquery.signalR-2.2.1.min.js")
+    @Scripts.Render("~/signalr/hubs")
+    <script type="text/javascript">
+        var commentBlockLoaded = false;
+        var comments = $.connection.commentsHub;
+        $(document).ready(function ()
+        {
+            if (!commentBlockLoaded && $(window).height() >= $(document).height())
+            {
+                LoadComments();
+            }
+            $(window).scroll(function()
+            {
+                if(!commentBlockLoaded && $(window).scrollTop() >= $(document).height() - $(window).height() - 250)
+                {
+                    LoadComments();
+                }
+            });
+        });
+
+
+
+        function LoadComments()
+        {
+            $.ajax({
+                url: '/News/GetComments',
+                //              timeout: 3000,
+                method: 'POST',
+                dataType: 'Json',
+                async: true,
+                data: { "articleId": @Model.Id },
+                beforeSend: function() {
+                    commentBlockLoaded = true;
+                    $('#loader').removeClass("hidden");
+                    $.connection.hub.start().done(function () {
+                        comments.server.connect(@Model.Id);
+                    });
+                }
+            }).done(function(data) {
+                console.log(data);
+                if (data.length > 0)
+                {
+
+                    $.each(data, function(index, data) {
+                        var templ = $("#template").html();
+                        templ = templ.split('[Id]').join(htmlEncode(data.Id));
+                        templ = templ.replace('[Name]', data.UserName);
+                        templ = templ.replace('[Text]', data.Text);
+                        templ = templ.replace('[Date]', htmlEncode(data.Created.replace('T',' ')));
+                        if(data.Depth == 0)
+                        {
+                            $('#comments').append(templ);
+                        }
+                        else
+                        {
+                            $('#comment-' + data.ReplyCommentId).append(templ);
+                        }
+
+
+                        $('#' + data.Id).on("click", function ()
+                        {
+                            var replyBtnId = $(this).attr('id');
+                            var sendBlock = $('.sendBlock.active');
+                            sendBlock.addClass('hidden');
+                            sendBlock.removeClass('active');
+                            $('#sendBlock-' + replyBtnId).addClass('active').removeClass('hidden');
+                            $('.showSendBlock.hidden').removeClass('hidden');
+                            $('#' + replyBtnId).addClass('hidden');
+                        });
+
+
+                        $('#send-' + data.Id).on("click", function() {
+                            var id = $(this).attr('id');
+                            id = id.replace('send-','');
+                            var textArea = $('#message-' + id);
+                            comments.server.send(@Model.Id, id, textArea.val());
+                            textArea.val('');
+                            $('.sendBlock.active').addClass('hidden').removeClass('active');
+                          //  $('#sendBlock').addClass('active').removeClass('hidden');
+                            $('.showSendBlock.hidden').removeClass('hidden');
+                        });
+                    });
+                }
+   
+                $('#send').on("click", function() {
+                    comments.server.send(@Model.Id, 0, $('#message').val());
+                    $('#message').val('');
+                });
+                $('#message').on("click", function () {
+                    $('.sendBlock.active').addClass('hidden').removeClass('active');
+                    $('.showSendBlock.hidden').removeClass('hidden');
+                })
+ 
+                $('#loader').addClass("hidden");
+                $('#sendBlock').removeClass("hidden");
+               // $('#sendBlock').addClass("active");
+            });
+        }
+
+        comments.client.addMessage = function (id,name, message, date, reply) {
+            var templ = $("#template").html();
+            templ = templ.split('[Id]').join(htmlEncode(id));
+            templ = templ.replace('[Name]', htmlEncode(name));
+            templ = templ.replace('[Text]', htmlEncode(message));
+            templ = templ.replace('[Date]', htmlEncode(date.replace('T',' ')));
+            if(reply == 0)
+            {
+                $('#comments').append(templ);
+            }
+            else
+            {
+                $('#comment-' + reply).append(templ);
+            }
+            $('#' + id).on("click", function ()
+            {
+                var replyBtnId = $(this).attr('id');
+                var sendBlock = $('.sendBlock.active');
+                sendBlock.addClass('hidden');
+                sendBlock.removeClass('active');
+                $('#sendBlock-' + replyBtnId).addClass('active').removeClass('hidden');
+                $('.showSendBlock.hidden').removeClass('hidden');
+                $('#' + replyBtnId).addClass('hidden');
+            });
+
+
+            $('#send-' + id).on("click", function() {
+                var id = $(this).attr('id');
+                id = id.replace('send-','');
+                var textArea = $('#message-' + id);
+                comments.server.send(@Model.Id, id, textArea.val());
+                textArea.val('');
+                $('.sendBlock.active').addClass('hidden').removeClass('active');
+              //  $('#sendBlock').addClass('active').removeClass('hidden');
+                $('.showSendBlock.hidden').removeClass('hidden');
+            });
+        }
+
+
+
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+
+    </script>
+    <script type="text/template" id="template">
+        <div class="comment" id="comment-[Id]">
+            <p class="commentName">[Name]</p>
+            <p class="commentDate">[Date]</p>
+            <p class="commentText">[Text]</p>
+            <input type="button" value="Ответить" class="showSendBlock commentsBtn" id="[Id]" />
+            <div class="sendBlock hidden" id="sendBlock-[Id]">
+                <textarea name="message" id="message-[Id]"></textarea>
+                <input type="button" class="replyBtn commentsBtn" value="Send" id="send-[Id]" />
+            </div>
+        </div>
+    </script>
+}
