@@ -8,6 +8,7 @@ using NewsWebSite.Models;
 using NewsWebSite.Models.Repository;
 using Microsoft.Security.Application;
 using System.Threading.Tasks;
+using System;
 
 namespace NewsWebSite.Hubs
 {
@@ -49,8 +50,9 @@ namespace NewsWebSite.Hubs
             comment.Text = text;
             comment.UserName = Context.User.Identity.Name.Split('@')[0];
             comment.Depth = commentDepth;
+            comment.Created = DateTime.Now;
             commentsRepository.Save(comment);
-            Clients.Group(articleId.ToString()).addMessage();
+            Clients.Group(articleId.ToString()).addMessage(comment.UserName, text, comment.Created, 0, 0);
         }
 
         // Подключение нового пользователя
