@@ -14,19 +14,23 @@ namespace NewsWebSite.Models.ViewModel
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
+        [Required]
         [Display(Name = "Заголовок статьи")]
         [StringLength(50, ErrorMessage = "Description Max Length is 50")]
         public string Title { get; set; }
 
+        [Required]
         [Display(Name = "Текст статьи")]
         [DataType(DataType.MultilineText)]
         [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
         public string FullDescription { get; set; }
 
+        [Required]
         [Display(Name = "Теги статьи")]
         [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
         public string Tags { get; set; }
 
+        [Required]
         [Display(Name = "Изображение")]
         [ValidImage(maxSizeMB = 5)]
         [AllowedExtensions(new string[] { ".jpg", ".png" })]

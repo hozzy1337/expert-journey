@@ -1,6 +1,4 @@
-﻿using NewsWebSite.Attributes;
-using NewsWebSite.Models.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -27,14 +25,6 @@ namespace NewsWebSite.Models
             Image = image;
             Tags = tags;
             UserId = userId;
-        }
-        public Article()
-        {
-            Title = null;
-            FullDescription = null;
-            Image = null;
-            CreateDate = DateTime.MinValue;
-            LastUpdateDate = DateTime.MinValue;
         }
     }
 }

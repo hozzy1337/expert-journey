@@ -6,9 +6,10 @@
       <generator class="native" />
     </id>
     <property name="UserName" />
-    <property name="Text" type="string" />
+    <property name="Text" />
     <property name="ArticleId" />
     <property name="Depth" />
     <property name="BaseCommentId" />
+    <property name="Created" />
   </class>
 </hibernate-mapping>

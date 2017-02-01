@@ -30,7 +30,7 @@ namespace NewsWebSite.Controllers
             this.repo = repo;
         }
 
-        
+
 
 
         #region ForDebug
@@ -58,7 +58,7 @@ namespace NewsWebSite.Controllers
         public ActionResult Index(bool onlyMyArt = false, string tags = "")
         {
             int userId = 0;
-           
+
             if (onlyMyArt && User.Identity.IsAuthenticated)
             {
                 userId = User.Identity.GetUserId<int>();
@@ -132,33 +132,20 @@ namespace NewsWebSite.Controllers
             var baseArticle = repo.GetItem(edited.Id);
 
             if (baseArticle == null || baseArticle.UserId != User.Identity.GetUserId<int>()) return HttpNotFound();
-            var changesExist = false;
-            if (edited.Image != null)
-            {
-                var fileHelper = new FileHelper();
-                var isChanged = fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id);
-                if (isChanged)
-                {
-                    baseArticle.Image = edited.Image.FileName;
-                    changesExist = true;
-                }
-            }
-            if (edited.Title != null && baseArticle.Title != edited.Title)
-            {
-                baseArticle.Title = edited.Title;
-                changesExist = true;
-            }
-            if (edited.FullDescription != null && baseArticle.FullDescription != edited.FullDescription)
-            {
-                baseArticle.FullDescription = edited.FullDescription;
-                changesExist = true;
-            }
-            if (edited.Tags != null && th.GetLine(baseArticle.Tags) != th.GetLine(edited.Tags))
-            {
-                baseArticle.Tags = th.GetLine(edited.Tags);
-                changesExist = true;
-            }
-            if (changesExist) repo.Save(baseArticle);
+
+
+            var fileHelper = new FileHelper();
+            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id);
+
+
+            baseArticle.Title = edited.Title;
+
+
+            baseArticle.FullDescription = edited.FullDescription;
+
+            baseArticle.Tags = th.GetLine(edited.Tags);
+
+            repo.Save(baseArticle);
             return RedirectToAction("Article", new { Id = edited.Id });
         }
 
@@ -168,7 +155,7 @@ namespace NewsWebSite.Controllers
         [HttpPost]
         public string GetArticles(int page = 1, int n = 1, int lastId = 0, bool onlyMyArticles = false, string tagLine = "")
         {
-            if (page < 1) return ""; 
+            if (page < 1) return "";
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
         }
