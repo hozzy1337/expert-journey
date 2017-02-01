@@ -72,6 +72,7 @@ namespace NewsWebSite.App_Start
             kernel.Bind<IArticleRepository>().To<ArticleRepository>();
             kernel.Bind<IUserRepository>().To<UserRepository>();
             kernel.Bind<ICommentsRepository>().To<CommentsRepository>();
+            kernel.Bind<ITagRepository>().To<TagRepository>();
             kernel.Bind<UserManager<AppUser, int>>().To<UserManager<AppUser, int>>();
             kernel.Bind<SignInManager<AppUser, int>>().To<SignInManager<AppUser, int>>();
             kernel.Bind<IUserStore<AppUser, int>>().To<CustomUserStore>();

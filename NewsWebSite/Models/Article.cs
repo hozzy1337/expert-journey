@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NewsWebSite.Attributes;
+using NewsWebSite.Models.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,19 +14,42 @@ namespace NewsWebSite.Models
         public virtual int Id { get; set; }
         public virtual string Title { get; set; }
         public virtual string FullDescription { get; set; }
+        public virtual string ShortDescription { get; set; }
         public virtual string Image { get; set; }
         public virtual DateTime CreateDate { get; set; }
         public virtual DateTime LastUpdateDate { get; set; }
         public virtual int UserId { get; set; }
-        public virtual string Tags { get; set; }
 
-        public Article(string title, string fulldescription, string image, string tags, int userId)
+        private ISet<Tag> tags = new HashSet<Tag>();
+
+        public virtual ISet<Tag> Tags
+        {
+            get
+            {
+                return tags;
+            }
+            set
+            {
+                tags = value;
+            }
+        }
+
+
+        public Article(string title,string shortdescription, string fulldescription, string image, int userId)
         {
             Title = title;
+            ShortDescription = shortdescription;
             FullDescription = fulldescription;
             Image = image;
-            Tags = tags;
             UserId = userId;
+        }
+        public Article()
+        {
+            Title = null;
+            FullDescription = null;
+            Image = null;
+            CreateDate = DateTime.MinValue;
+            LastUpdateDate = DateTime.MinValue;
         }
     }
 }

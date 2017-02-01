@@ -17,14 +17,16 @@ namespace NewsWebSite.Models.ViewModel
         public string Title { get; set; }
 
         [Required]
+        [Display(Name ="Краткое описание статьи")]
+        [StringLength(200 , ErrorMessage ="Максимальная длина описания статьи 200 символов")]
+        public string ShortDescription { get; set; }
+
+        [Required]
         [Display(Name = "Текст статьи")]
         [DataType(DataType.MultilineText)]
         [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
         public string FullDescription { get; set; }
 
-        [Required]
-        [Display(Name = "Теги статьи")]
-        [StringLength(100, ErrorMessage = "Tags Max Length is 100")]
         public string Tags { get; set; }
 
         [Required]
@@ -33,5 +35,8 @@ namespace NewsWebSite.Models.ViewModel
         [AllowedExtensions(new string[] {".jpg", ".png" })]
         [DataType(DataType.Upload)]
         public HttpPostedFileBase Image { get; set; }
+
+        [Display(Name ="Теги статьи")]
+        public IEnumerable<Tag> AllTags { get; set; }
     }
 }

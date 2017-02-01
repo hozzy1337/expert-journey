@@ -34,18 +34,6 @@ namespace NewsWebSite.Models.Repository
             }
         }
 
-        public bool IsExist(int id)
-        {
-            using (var session = sessionFactory.OpenSession())
-            {
-                var count = session.CreateCriteria<Article>()
-                    .SetProjection(Projections.RowCount())
-                    .Add(Restrictions.IdEq(id))
-                    .UniqueResult<int>();
-                return count == 1;
-            }
-        }
-
         public Article GetItem(int id)
         {
             using (var session = sessionFactory.OpenSession())
@@ -85,6 +73,7 @@ namespace NewsWebSite.Models.Repository
                     .Add(Projections.Id(), "Id")
                     .Add(Projections.Property("Title"), "Title")
                     .Add(Projections.Property("Image"), "Image")
+                    .Add(Projections.Property("ShortDescription"), "ShortDescription")
                     .Add(Projections.Property("CreateDate"), "CreateDate")
                     .Add(Projections.Property("LastUpdateDate"), "LastUpdateDate"))
                     .AddOrder(Order.Desc("Id"))
