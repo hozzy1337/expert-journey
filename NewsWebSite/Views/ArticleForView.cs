@@ -9,12 +9,14 @@ namespace NewsWebSite.Models
     {
         public int Id { get; set; }
         public string Title { get; set; }
+        public string ShortDescription { get; set; }
         public string FullDescription { get; set; }
         public string Image { get; set; }
         public string CreateDate { get; set; }
         public string UpdateDate { get; set; }
-        public string Tags { get; set; }
         public bool Editable { get; set; }
+
+        public ISet<Tag> ArticleTags { get; set; }
 
         public ArticleForView(Article a)
         {
@@ -22,9 +24,10 @@ namespace NewsWebSite.Models
             Title = a.Title;
             FullDescription = a.FullDescription;
             Image = a.Image;
-            Tags = (new TagsHelper()).GetLineToShow(a.Tags);
+            ArticleTags = a.Tags;
+            ShortDescription = a.ShortDescription;
             CreateDate = a.CreateDate.ToString("dd.MM.yyyy H:mm:ss");
-            UpdateDate = (a.CreateDate != a.LastUpdateDate ? a.LastUpdateDate.ToString("dd.MM.yyyy H:mm:ss") : null);
+            UpdateDate = (a.CreateDate != a.LastUpdateDate ? a.LastUpdateDate.ToString("dd.MM.yyyy H:mm:ss") : a.CreateDate.ToString("dd.MM.yyyy H:mm:ss"));
             Editable = false;
         }
         public ArticleForView() { }

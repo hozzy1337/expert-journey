@@ -1,0 +1,34 @@
+﻿@helper SelectedTagsList(ISet<NewsWebSite.Models.Tag> selectedTag , IEnumerable<NewsWebSite.Models.Tag> allTag){
+    <select name="tags" multiple="multiple" style="width:100%">
+        @foreach (NewsWebSite.Models.Tag tag in allTag)
+        {
+            if (selectedTag.Select(x => x.Id).Contains(tag.Id))
+            {
+                <option value="@tag.TagText" selected>@tag.TagText</option>
+            }
+            else
+            {
+                <option value="@tag.TagText" >@tag.TagText</option>
+            }
+        }
+    </select>
+}
+
+@helper SelectedTagsList(ISet<NewsWebSite.Models.Tag> articleTag)
+    {
+    <select name="tags" multiple="multiple" style="width:100%" disabled>
+        @foreach (NewsWebSite.Models.Tag tag in articleTag)
+        {
+                <option value="@tag.TagText" selected>@tag.TagText</option>
+        }
+    </select>
+}
+
+@helper TagsList(IEnumerable<NewsWebSite.Models.Tag> allTag){
+    <select name="tags" multiple="multiple" style="width:100%">
+        @foreach(NewsWebSite.Models.Tag tag in allTag)
+        {
+            <option value="@tag.TagText">@tag.TagText</option>
+        }
+        </select>
+        }

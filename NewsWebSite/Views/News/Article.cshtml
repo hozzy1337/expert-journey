@@ -24,5 +24,13 @@
     <p class="news-description">
         @Model.FullDescription
     </p>
-    <p class="news-description">Tags: @Model.Tags</p>
+    @TagListHelper.SelectedTagsList(Model.ArticleTags)
 </article>
+
+@section scripts {
+    <script>
+    $('select').select2({
+        tags:true
+    });
+    </script>
+    }

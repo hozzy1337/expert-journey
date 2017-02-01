@@ -30,6 +30,8 @@ h1{
 
 }
 
+
+
 .fixed{
 
     position: fixed;
@@ -277,6 +279,7 @@ header nav{
     overflow: hidden;
 
     z-index: 5;
+    margin-bottom:20px;
 
 }
 
@@ -399,9 +402,6 @@ header form input[type="button"]{
 .content{
 
     position: relative;
-
-    top:-80px;
-
     width:100%;
 
     display: flex;
@@ -614,6 +614,19 @@ header form input[type="button"]{
 
 }
 
+.right .news-item:nth-child(2n) .short{
+    z-index:999;
+    width:300px;
+    color:black;
+    position:absolute;
+    left:60px;
+    bottom:70px;
+    text-align:justify;
+    font-family: 'Scada', sans-serif;
+    font-size: 14px;
+
+}
+
 .right .news-item:nth-child(2n) h3 a{
 
     left:-25px;
@@ -673,6 +686,19 @@ header form input[type="button"]{
     margin-bottom: 40px;
 
     box-shadow: 20px 0px 25px -20px black, -20px 0px 25px -20px black;
+
+}
+
+.right .news-item .short{
+    z-index:999;
+    width:300px;
+    color:black;
+    position:absolute;
+    right:60px;
+    bottom:70px;
+    text-align:justify;
+    font-family: 'Scada', sans-serif;
+    font-size: 14px;
 
 }
 
@@ -1149,7 +1175,9 @@ header form input[type="button"]{
     font-weight: bold;
 
 }
-
+.right .news-create img{
+    height:100px;
+}
 
 
 .right .news-create header h3:after{
@@ -1296,62 +1324,109 @@ form .label-text{
 
 
 
-.right form input[type="submit"]{
+.right form input[type="submit"] , .right form>a{
 
-    margin-bottom: 20px;
-
-    padding-right: 3px;
-
-    margin-right: 20px;
-
-    border: none;
-
-    font-family: 'Scada', sans-serif;
-
-    font-size: 20px;
-
-    letter-spacing: -1px;
-
-    font-weight: bold;
-
-    background-color: inherit;
-
-    transition-property: all;
-
-    transition-duration: 0.4s;
-
+ color:black;
+ padding: 10px 20px;
+ text-decoration:none;
+ text-align:center;
+ margin:40px 20px 40px 0;
+ display: inline-block;
+ background-image: linear-gradient(to left,transparent,transparent 50%,rgb(82, 143, 188) 50%,rgb(82, 143, 188));
+ background-position: 100% 0;
+ background-color:white;
+ background-size: 200% 100%;
+ transition: all .25s ease-in;
+ font: 400 18px tahoma;
+ font-family: 'Scada', sans-serif;
+ font-weight:bold;
+ letter-spacing:1px;
+ border: 3px solid rgb(82, 143, 188);
 }
 
-.right form input[type="submit"]:hover{
 
-    color:rgb(82, 143, 188);
+.right form input[type="submit"]:hover , .right form>a:hover{
+
+    background-position: 0 0;
+    color:#fff;
 
 }
 
 
+.user-information{
+    height:350px;
+    position: relative;
+    border:1px solid  #b7b7b7;
+    box-shadow: 20px 0px 25px -20px black, -20px 0px 25px -20px black;
+}
 
-.right form a{
-
+.user-information .img{
+    display: inline-block;
+    position: relative;
+    margin:20px;
+    width:250px;
+    height:250px;
+    box-sizing: border-box;
+    background-image:url(../Content/Images/profile.png);
+    background-position: center;
+    background-size: cover;
+}
+.user-information .user-name{
+    display: block;
+    position: absolute;
+    width:250px;
+    bottom: 30px;
+    left: 20px;
     font-family: 'Scada', sans-serif;
+    font-size: 30px;
+    letter-spacing: -2px;
+    color:#152745;
+    text-align: center;
+}
 
-    font-size: 20px;
+.user-information .tags{
+    display: inline-block;
+    position: absolute;
+    width:520px;
+    height:100%;
+}
+.tags h3{
+    margin:20px 0;
+    font-family: 'Scada', sans-serif;
+    font-size: 25px;
+    color:rgb(34, 79, 113);
+}
 
-    letter-spacing: -1px;
-
-    font-weight: bold;
-
+.right>.user-information>.tags>form>input[type="submit"]{
     color:black;
-
-    text-decoration: none;
-
-    transition-property: all;
-
-    transition-duration: 0.4s;
-
+ padding: 10px 20px;
+ text-decoration:none;
+ text-align:center;
+ margin:40px 20px 40px 0;
+ display: inline-block;
+ background-image: linear-gradient(to left,transparent,transparent 50%,rgb(82, 143, 188) 50%,rgb(82, 143, 188));
+ background-position: 100% 0;
+ background-color:white;
+ background-size: 200% 100%;
+ transition: all .25s ease-in;
+ font: 400 18px tahoma;
+ font-family: 'Scada', sans-serif;
+ font-weight:bold;
+ letter-spacing:1px;
+ border: 3px solid rgb(82, 143, 188);
+}
+.right>.user-information>.tags>form>input[type="submit"]:hover{
+    background-position: 0 0;
+    color:#fff;
 }
 
-.right form a:hover{
+.right>.user-information>.tags>form>label{
+    display: inline-block;
+    width:29px;
+    height: 29px;
+    vertical-align: top;
+}
 
-    color: red;
-
+.right>.user-information>.tags>form>label:hover{
+   cursor: pointer;
 }

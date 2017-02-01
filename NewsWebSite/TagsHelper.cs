@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NewsWebSite.Models;
+using NewsWebSite.Models.Repository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,6 +9,33 @@ namespace NewsWebSite
 {
     public class TagsHelper
     {
+
+        public static IEnumerable<Tag> FormTagList(string[] tags , ITagRepository tagRepo)
+        {
+            List<string> allTag = tagRepo.GetAllTags().Select(x => x.TagText).ToList();
+            List<string> needInSave = tags.ToList().Except(allTag).ToList();
+            List<string> areInDB = tags.ToList().Intersect(allTag).ToList();
+            IEnumerable<Tag> loadTags = tagRepo.GatTagsGroupByNames(areInDB.ToArray()).Concat(tagRepo.SaveTagsGroup(needInSave.ToArray()));
+            return loadTags;
+        }
+        public static void SetTagForModel(Article article , IEnumerable<Tag> tagList)
+        {
+            article.Tags.Clear();
+            foreach (Tag tag in tagList)
+            {
+                article.Tags.Add(tag);
+            }
+        }
+
+        public static void SetTagForModel(AppUser user , IEnumerable<Tag> tagList)
+        {
+            user.Tags.Clear();
+            foreach(Tag tag in tagList)
+            {
+                user.Tags.Add(tag);
+            }
+        }
+
         public string[] GetArray(string tags)
         {
 
