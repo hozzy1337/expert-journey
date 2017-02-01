@@ -1,4 +1,4 @@
-﻿@using NewsWebSite.Models;
+@using NewsWebSite.Models;
 @model ArticleForView
 @{
     Layout = "~/Views/Shared/Lay.cshtml";
@@ -24,9 +24,10 @@
     <p class="news-description">
         @Model.FullDescription
     </p>
-    <p class="news-description">Tags: @Model.Tags</p>
-
+     @TagListHelper.SelectedTagsList(Model.ArticleTags)
 </article>
+    
+
 <div class="commentsBlock">
     <div id="comments" class="comments">
         <div id="loader" class="hidden"></div>
@@ -196,4 +197,10 @@
             </div>
         </div>
     </script>
+     <script>
+    $('select').select2({
+        tags:true
+    });
+    </script>
+    
 }

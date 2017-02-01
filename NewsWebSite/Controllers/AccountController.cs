@@ -12,6 +12,7 @@ using NewsWebSite.Models;
 using NewsWebSite.Models.Default;
 using NewsWebSite.Models.Repository;
 using NewsWebSite.Models.ViewModel;
+using System.Collections.Generic;
 
 namespace NewsWebSite.Controllers
 {
@@ -25,13 +26,15 @@ namespace NewsWebSite.Controllers
         {
         }
 
-        public AccountController(UserManager<AppUser, int> userManager, SignInManager<AppUser, int> signInManager, IUserRepository repo)
+        public AccountController(UserManager<AppUser, int> userManager, SignInManager<AppUser, int> signInManager, IUserRepository repo , ITagRepository tagRepo)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             this.repo = repo;
+            this.tagRepo = tagRepo;
         }
         readonly IUserRepository repo;
+        readonly ITagRepository tagRepo;
         readonly SignInManager<AppUser, int> SignInManager;
         readonly UserManager<AppUser, int> UserManager;
 
@@ -42,6 +45,32 @@ namespace NewsWebSite.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             return View();
+        }
+
+        public ActionResult Index()
+        {
+            AppUser currentUser = repo.GetById(User.Identity.GetUserId<int>());
+            UserViewModel userView = new UserViewModel { UserName = currentUser.UserName, UserTags = currentUser.Tags ,AllTags=tagRepo.GetAllTags() };
+            return View(userView);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult SaveOrUpdateUserTags(string[] tags)
+        {
+            AppUser currentUser = repo.GetById(User.Identity.GetUserId<int>());
+            currentUser.Tags.Clear();
+            if(tags==null)
+            {
+                repo.Save(currentUser);
+            }
+            else
+            {
+                IEnumerable<Tag> tagsList = TagsHelper.FormTagList(tags, tagRepo);
+                TagsHelper.SetTagForModel(currentUser, tagsList);
+                repo.Save(currentUser);
+            }
+            return RedirectToAction("Index");
         }
 
         //

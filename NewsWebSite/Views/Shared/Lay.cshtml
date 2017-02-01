@@ -4,36 +4,13 @@
 <head>
     <meta charset="UTF-8">
     @Styles.Render("~/Content/Style.css")
+    @Styles.Render("//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css")
     @Styles.Render("https://fonts.googleapis.com/css?family=EB+Garamond")
     @Styles.Render("https://fonts.googleapis.com/css?family=El+Messiri|Rubik+One")
     @Styles.Render("https://fonts.googleapis.com/css?family=Scada")
     <title>News Portal</title>
 </head>
 <body>
-    <div id="login-form" class="login-window">
-        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary()
-            <label for="Email">Почтовый адресс</label>
-            <input type="text" name="Email" id="Email">
-            <label for="Password">Пароль</label>
-            <input type="password" name="Password" id="Password">
-            <label for="RememberMe">Запомнить меня</label>
-            <input type="checkbox" name="RememberMe" id="remember" /><br />
-            <input type="submit" value="ВОЙТИ">
-            <a href="@Url.Action("Register", "Account")">ЗАРЕГИСТРИРОВАТЬСЯ</a>
-        }
-        @*@using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.Label(ViewBag.Login.Email)
-
-                <input type="submit" value="ВОЙТИ">
-                <a href="@Url.Action("UserRegistration")">ЗАРЕГИСТРИРОВАТЬСЯ</a>
-            }*@
-    </div>
-    <div id="window-bg" class="bg-container">
-    </div>
     <div class="main-page">
         <header>
             <div id="main" class="logo">
@@ -45,18 +22,16 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li><a href="@Url.Action("CreateArticle", "News")">создать новость</a></li>
+                        <li><a href="@Url.Action("InterestingNews", "News")">интерестные новости</a></li>
+                        <li><a href="@Url.Action("Index", "Account")">профиль</a></li>
                         <li><a href="@Url.Action("LogOff", "Account")">выйти (@User.Identity.Name.Split('@')[0])</a></li>
                     }
                     else
                     {
-                        <li><a id="loged-button" href="">войти</a></li>
+                        <li><a id="loged-button" href="@Url.Action("LogIn" , "Account")">войти</a></li>
                     }
                 </ul>
             </nav>
-            <form action="" method="get">
-                <input type="search" class="hidden" name="search-field" placeholder="Введите текст">
-                <input id="search-submit" type="button" value="">
-            </form>
         </header>
         <div class="content">
             @*<div class="left block">
@@ -94,6 +69,7 @@
 
     @Scripts.Render("~/Scripts/jquery-3.1.1.js")
     @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+
     @* <!-- Прилипание сайдбара-->
         <script>
             $(window).on("scroll", function () {
@@ -101,6 +77,7 @@
                 else { $('.left').removeClass('fixed'); $('.right').removeClass('right-content'); $('#to-up').addClass('hidden'); }
             });
         </script>*@
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

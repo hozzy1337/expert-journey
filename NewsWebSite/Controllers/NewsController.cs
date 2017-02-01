@@ -1,4 +1,4 @@
-﻿using NewsWebSite.Models.ViewModel;
+ ﻿using NewsWebSite.Models.ViewModel;
 using NewsWebSite.Models;
 using Newtonsoft.Json;
 using NHibernate.Criterion;
@@ -20,19 +20,24 @@ namespace NewsWebSite.Controllers
     public class NewsController : Controller
     {
         readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
-
-        readonly TagsHelper th = new TagsHelper();
+     
         readonly IArticleRepository repo;
+
         readonly ICommentsRepository commentsRepository;
 
+        readonly ITagRepository tagRepo;
+        readonly IUserRepository userRepo;
 
-        public NewsController(IArticleRepository repo, ICommentsRepository commentsRepository)
+        public NewsController(IArticleRepository repo,IUserRepository userRepo , ITagRepository tagRepo, ICommentsRepository commentsRepository)
+
         {
+            this.userRepo = userRepo;
+            this.tagRepo = tagRepo;
             this.repo = repo;
             this.commentsRepository = commentsRepository;
         }
 
-
+        
 
 
         #region ForDebug
@@ -46,7 +51,6 @@ namespace NewsWebSite.Controllers
                 var a = new Article();
                 a.Title = i.ToString();
                 a.FullDescription = a.Title;
-                a.Tags = ",tag,tag1,";
                 a.UserId = 11;
                 repo.Save(a);
 
@@ -60,7 +64,7 @@ namespace NewsWebSite.Controllers
         public ActionResult Index(bool onlyMyArt = false, string tags = "")
         {
             int userId = 0;
-
+           
             if (onlyMyArt && User.Identity.IsAuthenticated)
             {
                 userId = User.Identity.GetUserId<int>();
@@ -86,7 +90,6 @@ namespace NewsWebSite.Controllers
                 var viewArticle = new ArticleForView(article);
                 if (article.UserId == User.Identity.GetUserId<int>())
                     viewArticle.Editable = true;
-                viewArticle.Tags = th.GetLineToShow(viewArticle.Tags);
                 return View(viewArticle);
             }
             return HttpNotFound();
@@ -96,17 +99,20 @@ namespace NewsWebSite.Controllers
         [Authorize]
         public ActionResult CreateArticle()
         {
-            return View();
+            CreateArticleModel createArticle = new CreateArticleModel { AllTags = tagRepo.GetAllTags() };
+            return View(createArticle);
         }
 
 
         [HttpPost]
         [Authorize]
-        public ActionResult CreateArticle(CreateArticleModel a)
+        public ActionResult CreateArticle(CreateArticleModel a , string[] tags)
         {
             if (!ModelState.IsValid) return View(a);
-            var tags = th.GetLine(a.Tags);
-            Article newArticle = new Article(a.Title, a.FullDescription, a.Image.FileName, tags, User.Identity.GetUserId<int>());
+            Article newArticle = new Article(a.Title, a.ShortDescription, a.FullDescription, a.Image.FileName, User.Identity.GetUserId<int>());
+            newArticle.Tags.Clear();
+            IEnumerable<Tag> articleTags = TagsHelper.FormTagList(tags, tagRepo);
+            TagsHelper.SetTagForModel(newArticle, articleTags);
             var id = repo.Save(newArticle);
             FileHelper fileHelper = new FileHelper();
             fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), a.Image, id);
@@ -120,43 +126,75 @@ namespace NewsWebSite.Controllers
         {
             if (id < 1) return HttpNotFound();
             var article = repo.GetItem(id);
-
+            EditArticleModel editArticle = new EditArticleModel(article);
+            editArticle.AllTags = tagRepo.GetAllTags();
             if (article == null || article.UserId != User.Identity.GetUserId<int>()) return HttpNotFound();
-            return View(new EditArticleModel(article));
+            return View(editArticle);
+        }
+
+        public ActionResult InterestingNews()
+        {
+            AppUser currentUser = userRepo.GetById(User.Identity.GetUserId<int>());
+            List<ArticleForView> interestingArticles = new List<ArticleForView>();
+            foreach(Tag tag in currentUser.Tags)
+            {
+                foreach(Article article in tag.Articles)
+                {
+                    if(!interestingArticles.Select(m=>m.Id).Contains(article.Id))
+                    {
+                        interestingArticles.Add(new ArticleForView(article));
+                    }
+                }
+            }
+            return View(interestingArticles);
         }
 
 
         [HttpPost]
         [Authorize]
-        public ActionResult EditArticle(EditArticleModel edited)
+        public ActionResult EditArticle(EditArticleModel edited , string[] tags)
         {
             if (!ModelState.IsValid) return View(edited);
             var baseArticle = repo.GetItem(edited.Id);
-            var changed = false;
+
             if (baseArticle == null || baseArticle.UserId != User.Identity.GetUserId<int>()) return HttpNotFound();
 
-
-            var fileHelper = new FileHelper();
-            if (edited.Image != null &&
-            fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id))
-                changed = true;
-
+            var changesExist = false;
+            if (edited.Image != null)
+            {
+                var fileHelper = new FileHelper();
+                var isChanged = fileHelper.SaveOrUpdateArticleImage(Server.MapPath(ConfigurationManager.AppSettings["UserImagesFolder"]), edited.Image, baseArticle.Id);
+                if (isChanged)
+                {
+                    baseArticle.Image = edited.Image.FileName;
+                    changesExist = true;
+                }
+            }
             if (baseArticle.Title != edited.Title)
             {
                 baseArticle.Title = edited.Title;
-                changed = true;
+                changesExist = true;
             }
-
+            if (baseArticle.ShortDescription != edited.ShortDescription)
+            {
+                baseArticle.ShortDescription = edited.ShortDescription;
+                changesExist = true;
+            }
             if (baseArticle.FullDescription != edited.FullDescription)
             {
                 baseArticle.FullDescription = edited.FullDescription;
-                changed = true;
+                changesExist = true;
+            }
+            baseArticle.Tags.Clear();
+            if(tags!=null)
+            {
+                IEnumerable<Tag> newTags = TagsHelper.FormTagList(tags, tagRepo);
+                TagsHelper.SetTagForModel(baseArticle, newTags);
+		changesExist = true;
             }
 
-
-            baseArticle.Tags = th.GetLine(edited.Tags);
-
-            repo.Save(baseArticle);
+    
+            if (changesExist) repo.Save(baseArticle);
             return RedirectToAction("Article", new { Id = edited.Id });
         }
 
@@ -166,7 +204,7 @@ namespace NewsWebSite.Controllers
         [HttpPost]
         public string GetArticles(int page = 1, int n = 1, int lastId = 0, bool onlyMyArticles = false, string tagLine = "")
         {
-            if (page < 1) return "";
+            if (page < 1) return ""; 
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
         }

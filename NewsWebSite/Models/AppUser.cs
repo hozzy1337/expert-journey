@@ -16,5 +16,18 @@ namespace NewsWebSite.Models
         public virtual bool LockoutEnabled { get; set; }
         public virtual DateTimeOffset lockoutEnd { get; set; }
 
+        private ISet<Tag> tags = new HashSet<Tag>();
+        public virtual ISet<Tag> Tags
+        {
+            get
+            {
+                return tags;
+            }
+            set
+            {
+                tags = value;
+            }
+        }
+
     }
 }
