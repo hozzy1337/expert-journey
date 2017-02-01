@@ -1,4 +1,4 @@
-﻿using NewsWebSite.Models.ViewModel;
+ ﻿using NewsWebSite.Models.ViewModel;
 using NewsWebSite.Models;
 using Newtonsoft.Json;
 using NHibernate.Criterion;
@@ -20,17 +20,21 @@ namespace NewsWebSite.Controllers
     public class NewsController : Controller
     {
         readonly int NumberOfItemsOnPage = int.Parse(ConfigurationManager.AppSettings["NumberOfItemsOnPage"]);
-
-        readonly TagsHelper th = new TagsHelper();
+     
         readonly IArticleRepository repo;
+
+        readonly ICommentsRepository commentsRepository;
+
         readonly ITagRepository tagRepo;
         readonly IUserRepository userRepo;
 
-        public NewsController(IArticleRepository repo,IUserRepository userRepo , ITagRepository tagRepo)
+        public NewsController(IArticleRepository repo,IUserRepository userRepo , ITagRepository tagRepo, ICommentsRepository commentsRepository)
+
         {
             this.userRepo = userRepo;
             this.tagRepo = tagRepo;
             this.repo = repo;
+            this.commentsRepository = commentsRepository;
         }
 
         
@@ -154,6 +158,7 @@ namespace NewsWebSite.Controllers
             var baseArticle = repo.GetItem(edited.Id);
 
             if (baseArticle == null || baseArticle.UserId != User.Identity.GetUserId<int>()) return HttpNotFound();
+
             var changesExist = false;
             if (edited.Image != null)
             {
@@ -165,17 +170,17 @@ namespace NewsWebSite.Controllers
                     changesExist = true;
                 }
             }
-            if (edited.Title != null && baseArticle.Title != edited.Title)
+            if (baseArticle.Title != edited.Title)
             {
                 baseArticle.Title = edited.Title;
                 changesExist = true;
             }
-            if (edited.ShortDescription != null && baseArticle.ShortDescription != edited.ShortDescription)
+            if (baseArticle.ShortDescription != edited.ShortDescription)
             {
                 baseArticle.ShortDescription = edited.ShortDescription;
                 changesExist = true;
             }
-            if (edited.FullDescription != null && baseArticle.FullDescription != edited.FullDescription)
+            if (baseArticle.FullDescription != edited.FullDescription)
             {
                 baseArticle.FullDescription = edited.FullDescription;
                 changesExist = true;
@@ -185,8 +190,10 @@ namespace NewsWebSite.Controllers
             {
                 IEnumerable<Tag> newTags = TagsHelper.FormTagList(tags, tagRepo);
                 TagsHelper.SetTagForModel(baseArticle, newTags);
+		changesExist = true;
             }
-            repo.Save(baseArticle);
+
+    
             if (changesExist) repo.Save(baseArticle);
             return RedirectToAction("Article", new { Id = edited.Id });
         }
@@ -200,6 +207,13 @@ namespace NewsWebSite.Controllers
             if (page < 1) return ""; 
             var lst = repo.GetDemoList(page * NumberOfItemsOnPage, n * NumberOfItemsOnPage, lastId, th.GetArray(tagLine));// as IList<DemoArticle>;
             return JsonConvert.SerializeObject(lst);
+        }
+
+        [HttpPost]
+        public string GetComments(int articleId)
+        {
+            var list = commentsRepository.GetList(articleId);
+            return JsonConvert.SerializeObject(list);
         }
 
         #endregion

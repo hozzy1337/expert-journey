@@ -36,24 +36,12 @@ namespace NewsWebSite.Models.Repository
             }
         }
 
-        public int GetBaseCommentDepth(int id)
-        {
-            using (var session = sessionFactory.OpenSession())
-            {
-                var baseCommentDepth = session.CreateCriteria<Comment>()
-                .SetProjection(Projections.Property("Depth"))
-                .Add(Restrictions.IdEq(id))
-                .UniqueResult<int>();
-                return baseCommentDepth;
-            }
-        }
-
-        public int GetBaseCommentId(int id)
+        public int GetReplyCommentId(int id)
         {
             using (var session = sessionFactory.OpenSession())
             {
                 var baseCommentId = session.CreateCriteria<Comment>()
-                .SetProjection(Projections.Property("BaseCommentId"))
+                .SetProjection(Projections.Property("ReplyCommentId"))
                 .Add(Restrictions.IdEq(id))
                 .UniqueResult<int>();
                 return baseCommentId;
@@ -67,12 +55,10 @@ namespace NewsWebSite.Models.Repository
                 var baseCommentId = session.CreateCriteria<Comment>()
                 .SetProjection(Projections.ProjectionList()
                 .Add(Projections.Property("Depth"), "Depth")
-                .Add(Projections.Property("BaseArticleId"), "BaseArticleId"))
+                .Add(Projections.Property("ArticleId"), "ArticleId"))
                 .Add(Restrictions.IdEq(id))
                 .SetResultTransformer(Transformers.AliasToBean<CommentInfo>())
                 .UniqueResult<CommentInfo>();
-
-              
                 return baseCommentId;
             }
         }
@@ -85,26 +71,42 @@ namespace NewsWebSite.Models.Repository
             }
         }
 
-        public PagedList<Comment> GetList(int articleId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsExist(int id)
+        public IList<Comment> GetList(int articleId)
         {
             using (var session = sessionFactory.OpenSession())
             {
-                var count = session.CreateCriteria<Comment>()
-                .SetProjection(Projections.RowCount())
-                .Add(Restrictions.IdEq(id))
-                .UniqueResult<int>();
-                return count == 1;
+                var list = session.CreateCriteria<Comment>()
+                    .Add(Restrictions.Eq("ArticleId", articleId))
+                      .AddOrder(Order.Asc("Depth"))
+                .AddOrder(Order.Asc("Id"))
+                    .List<Comment>();
+                return list;
             }
         }
 
+        //public bool IsExist(int id)
+        //{
+        //    using (var session = sessionFactory.OpenSession())
+        //    {
+        //        var count = session.CreateCriteria<Comment>()
+        //        .SetProjection(Projections.RowCount())
+        //        .Add(Restrictions.IdEq(id))
+        //        .UniqueResult<int>();
+        //        return count == 1;
+        //    }
+        //}
+
         public int Save(Comment comment)
         {
-            throw new NotImplementedException();
+            using (var session = sessionFactory.OpenSession())
+            {
+                using (var t = session.BeginTransaction())
+                {
+                    session.SaveOrUpdate(comment);
+                    t.Commit();
+                    return comment.Id;
+                }
+            }
         }
     }
 }

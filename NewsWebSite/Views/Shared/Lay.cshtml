@@ -34,33 +34,33 @@
             </nav>
         </header>
         <div class="content">
-            <div class="left block">
-                <section class="post">
-                    <header><h3><span>популярные</span></h3></header>
-                    <div class="news-item">
-                        <div class="news-img">
-                            <img src="Images/nastol.com.ua_203349.jpg" alt="">
+            @*<div class="left block">
+                    <section class="post">
+                        <header><h3><span>популярные</span></h3></header>
+                        <div class="news-item">
+                            <div class="news-img">
+                                <img src="Images/nastol.com.ua_203349.jpg" alt="">
+                            </div>
+                            <span class="upload-time">23.2015</span>
+                            <h3><a href="">BELLS CRISTMAS TREES</a></h3>
                         </div>
-                        <span class="upload-time">23.2015</span>
-                        <h3><a href="">BELLS CRISTMAS TREES</a></h3>
-                    </div>
-                    <div class="news-item">
-                        <div class="news-img">
-                            <img src="Images/nastol.com.ua_203349.jpg" alt="">
+                        <div class="news-item">
+                            <div class="news-img">
+                                <img src="Images/nastol.com.ua_203349.jpg" alt="">
+                            </div>
+                            <span class="upload-time">23.2015</span>
+                            <h3><a href="">BELLS CRISTMAS TREES</a></h3>
                         </div>
-                        <span class="upload-time">23.2015</span>
-                        <h3><a href="">BELLS CRISTMAS TREES</a></h3>
-                    </div>
-                    <div class="news-item">
-                        <div class="news-img">
-                            <img src="Images/nastol.com.ua_203349.jpg" alt="">
+                        <div class="news-item">
+                            <div class="news-img">
+                                <img src="Images/nastol.com.ua_203349.jpg" alt="">
+                            </div>
+                            <span class="upload-time">23.2015</span>
+                            <h3><a href="">BELLS CRISTMAS TREES</a></h3>
                         </div>
-                        <span class="upload-time">23.2015</span>
-                        <h3><a href="">BELLS CRISTMAS TREES</a></h3>
-                    </div>
-                </section>
-                <a id="to-up" class="hidden" href="#main">В НАЧАЛО</a>
-            </div>
+                    </section>
+                    <a id="to-up" class="hidden" href="#main">В НАЧАЛО</a>
+                </div>*@
             <div class="right block">
                 @RenderBody()
             </div>
@@ -69,37 +69,15 @@
 
     @Scripts.Render("~/Scripts/jquery-3.1.1.js")
     @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
-    <script>
-       
-        $("#window-bg").click(function () {
-            $("#login-form").animate({ opacity: 1, top: "-40%" }, 400, function () {
-                $(this).css("display", "none");
-                $("#window-bg").fadeOut(200);
+
+    @* <!-- Прилипание сайдбара-->
+        <script>
+            $(window).on("scroll", function () {
+                if ($(window).scrollTop() > 275) { $('.left').addClass('fixed'); $('.right').addClass('right-content'); $('#to-up').removeClass('hidden'); }
+                else { $('.left').removeClass('fixed'); $('.right').removeClass('right-content'); $('#to-up').addClass('hidden'); }
             });
-        });
-    </script>
-    <script>
-        $("#search-submit").click(ShowSearh);
-        function ShowSearh() {
-            if (!$("[type=search]").hasClass("hidden")) {
-                $("[type=search]").addClass("hidden");
-                $("nav").removeClass("hidden");
-            }
-            else {
-                $("[type=search]").removeClass("hidden");
-                $("nav").addClass("hidden");
-            }
-        }
-    </script>
-    <!-- Прилипание сайдбара-->
-    <script>
-        $(window).on("scroll", function () {
-            if ($(window).scrollTop() > 275) { $('.left').addClass('fixed'); $('.right').addClass('right-content'); $('#to-up').removeClass('hidden'); }
-            else { $('.left').removeClass('fixed'); $('.right').removeClass('right-content'); $('#to-up').addClass('hidden'); }
-        });
-    </script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+        </script>*@
+
     @RenderSection("scripts", required: false)
 </body>
-<!-- Строка поиск-->
 </html>

@@ -28,6 +28,7 @@ namespace NewsWebSite.Models.ViewModel
         [StringLength(2000, ErrorMessage = "Description Max Length is 2000")]
         public string FullDescription { get; set; }
 
+
         [Display(Name = "Изображение")]
         [ValidImage(maxSizeMB = 5)]
         [AllowedExtensions(new string[] { ".jpg", ".png" })]

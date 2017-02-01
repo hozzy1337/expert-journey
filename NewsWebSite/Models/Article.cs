@@ -19,7 +19,6 @@ namespace NewsWebSite.Models
         public virtual DateTime CreateDate { get; set; }
         public virtual DateTime LastUpdateDate { get; set; }
         public virtual int UserId { get; set; }
-
         private ISet<Tag> tags = new HashSet<Tag>();
 
         public virtual ISet<Tag> Tags
@@ -36,6 +35,7 @@ namespace NewsWebSite.Models
 
 
         public Article(string title,string shortdescription, string fulldescription, string image, int userId)
+
         {
             Title = title;
             ShortDescription = shortdescription;
@@ -43,13 +43,8 @@ namespace NewsWebSite.Models
             Image = image;
             UserId = userId;
         }
-        public Article()
-        {
-            Title = null;
-            FullDescription = null;
-            Image = null;
-            CreateDate = DateTime.MinValue;
-            LastUpdateDate = DateTime.MinValue;
-        }
+	 
+        public Article() { }   
+
     }
 }

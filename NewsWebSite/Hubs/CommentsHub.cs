@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.SignalR;
 using NewsWebSite.Models.SignalrModels;
@@ -8,6 +8,7 @@ using NewsWebSite.Models;
 using NewsWebSite.Models.Repository;
 using Microsoft.Security.Application;
 using System.Threading.Tasks;
+using System;
 
 namespace NewsWebSite.Hubs
 {
@@ -23,34 +24,34 @@ namespace NewsWebSite.Hubs
             this.commentsRepository = commentsRepository;
         }
 
-       // static readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
+        // static readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
         //static readonly List<CommentsUser> Users = new List<CommentsUser>();
 
         // Отправка сообщений
         [Authorize]
         public void Send(int articleId = 0, int replyCommentId = 0, string text = "")
         {
-
             text = Sanitizer.GetSafeHtmlFragment(text);
-            if (text.Length <= 0 || text.Length > 100)
-                Clients.Caller.InvalidTextLength();
-            else
+            if (text.Length <= 0 || text.Length > 250) return;
             if (replyCommentId < 0) return;
-            Comment comment = new Comment();
-            if (replyCommentId > 0)
+            var commentDepth = 0;
+            if (replyCommentId != 0)
             {
                 var baseComment = commentsRepository.GetCommentInfo(replyCommentId);
-                if (baseComment != null)
-                {
-                    if (articleId != baseComment.ArticleId) return;
-                    comment.ArticleId = articleId;
-                    comment.Depth = ++baseComment.Depth;
-                    comment.Text = text;
-
-                    Clients.Group(articleId.ToString()).addMessage();
-                }    
-            }
+                if (baseComment == null) return;
+                commentDepth = baseComment.Depth + 1;
                 
+            }
+            else if (!articleRepository.IsExist(articleId)) return;
+            Comment comment = new Comment();
+            comment.ArticleId = articleId;
+            comment.Text = text;
+            comment.UserName = Context.User.Identity.Name.Split('@')[0];
+            comment.Depth = commentDepth;
+            comment.Created = DateTime.Now;
+            comment.ReplyCommentId = replyCommentId;
+            var id = commentsRepository.Save(comment);
+            Clients.Group(articleId.ToString()).addMessage(id, comment.UserName, comment.Text, comment.Created.ToString("yyyy-MM-dd HH:mm:ss"), replyCommentId);
         }
 
         // Подключение нового пользователя
@@ -58,44 +59,9 @@ namespace NewsWebSite.Hubs
         {
             var id = Context.ConnectionId;
             Groups.Add(id, articleId.ToString());
-            //var user = Context.User;
-            //if (!user.Identity.IsAuthenticated) return;
-            //if (!Users.Any(u => u.ConnectionId == id))
-            //{
-            //    locker.EnterWriteLock();
-            //    try
-            //    {
-            //        Users.Add(new CommentsUser { ConnectionId = id, UserName = user.Identity.Name, AppUserId = user.Identity.GetUserId<int>(), ArticleId = articleId });
-            //    }
-            //    finally
-            //    {
-            //        locker.ExitWriteLock();
-            //    }
-            //}
         }
 
-        // Отключение пользователя
-        public override Task OnDisconnected(bool stopCalled)
-        {
-            // var item = Users.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-            //  if (item != null)
-            // {
-            //locker.EnterWriteLock();
-            //try
-            //{
-            //    Users.Remove(item);
-            //}
-            //finally
-            //{
-            //    locker.ExitWriteLock();
-            //}
-            Groups.Remove(Context.ConnectionId, "");
-                var id = Context.ConnectionId;
-                //Clients.All.onUserDisconnected(id, item.Name);
-    //        }
 
-            return base.OnDisconnected(stopCalled);
-        }
     }
 
 

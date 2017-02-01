@@ -11,6 +11,8 @@ namespace NewsWebSite.Models
         public virtual string  Text { get; set; }
         public virtual int ArticleId { get; set; }
         public virtual int Depth { get; set; }
-        public virtual int BaseCommentId { get; set; }
+        public virtual int ReplyCommentId { get; set; }
+        public virtual DateTime Created { get; set; }
+
     }
 }
