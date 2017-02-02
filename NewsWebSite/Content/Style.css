@@ -474,6 +474,8 @@ header form {
         background-color: white;
         transition-property: all;
         transition-duration: 0.5s;
+        overflow:hidden;
+        text-overflow:clip;
     }
 
         .right .news-item h3 a:after {
